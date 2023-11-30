@@ -1,0 +1,66 @@
+package com.nastyaApp.manual
+
+// TODO add user avatar
+
+/*
+ALTER TABLE users
+ALTER COLUMN login
+SET UNIQUE;
+*/
+
+/*
+CREATE TABLE tokens(
+token UUID PRIMARY KEY NOT NULL,
+userId UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);
+*/
+
+/*
+CREATE TABLE comments(
+id UUID PRIMARY KEY NOT NULL,
+text text NOT NULL,
+author UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
+createDate date NOT NULL
+);
+*/
+
+/*
+CREATE TABLE coms(
+id UUID PRIMARY KEY NOT NULL,
+description text NOT NULL,
+imageURL text NOT NULL,
+createDate date NOT NULL,
+userId UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);
+*/
+
+/*
+CREATE TABLE boards(
+id UUID PRIMARY KEY NOT NULL,
+name text NOT NULL,
+userId UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);
+*/
+
+/*
+CREATE TABLE likers_helper(
+id UUID PRIMARY KEY NOT NULL,
+comId UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL,
+userId UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);*/
+
+/*
+CREATE TABLE boards_helper(
+id UUID PRIMARY KEY NOT NULL,
+boardId UUID REFERENCES boards (id) ON DELETE CASCADE NOT NULL,
+comId UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL
+);*/
+
+/*
+CREATE TABLE comments_helper(
+id UUID PRIMARY KEY NOT NULL,
+comId UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL,
+commentId UUID REFERENCES comments (id) ON DELETE CASCADE NOT NULL
+);
+*/
+
