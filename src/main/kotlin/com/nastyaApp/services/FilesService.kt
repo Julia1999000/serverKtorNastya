@@ -3,7 +3,7 @@ package com.nastyaApp.services
 import com.nastyaApp.controllers.FilesController
 import com.nastyaApp.utils.apiCatch
 import com.nastyaApp.utils.getIdFromRequest
-import com.nastyaApp.utils.getTokenFromHeaders
+import com.nastyaApp.utils.getUserTokenFromHeaders
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -15,7 +15,7 @@ object FilesService {
 
     suspend fun uploadFile(call: ApplicationCall) {
         apiCatch(call) {
-            getTokenFromHeaders(call) ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Token not found")
+            getUserTokenFromHeaders(call) ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Token not found")
 
             val partsList = call.receiveMultipart().readAllParts()
             if (partsList.size > 1) {

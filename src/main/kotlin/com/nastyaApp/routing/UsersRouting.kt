@@ -12,7 +12,7 @@ fun Route.configureUsersRouting() {
         }
 
         post("/login") {
-            UsersService.login(call)
+            UsersService.loginUser(call)
         }
 
         get("/getInfo/{id}") {
@@ -35,8 +35,8 @@ fun Route.configureUsersRouting() {
             UsersService.getAllUsers(call)
         }
 
-        delete("/unlog/{id}") {
-            UsersService.unlog(call)
+        delete("/unlogin/{id}") {
+            UsersService.unloginUser(call)
         }
 
         delete("/delAvatar/{id}") {

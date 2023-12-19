@@ -32,13 +32,13 @@ object UsersController {
 
     suspend fun selectByLogin(login: String): UserTableRowDTO? {
         return dbQuery {
-            UsersTable.select { UsersTable.login eq login }.singleOrNull()?.toUserDTO()
+            UsersTable.select { UsersTable.login eq login }.singleOrNull()?.toUserTableRowDTO()
         }
     }
 
     suspend fun selectById(id: UUID): UserTableRowDTO? {
         return dbQuery {
-            UsersTable.select { UsersTable.id eq id }.singleOrNull()?.toUserDTO()
+            UsersTable.select { UsersTable.id eq id }.singleOrNull()?.toUserTableRowDTO()
         }
     }
 
@@ -54,12 +54,12 @@ object UsersController {
     }
 
     //TODO pagination
-    suspend fun selectAllUsers(offsetId: String?): List<UserTableRowDTO> {
+    suspend fun selectAll(offsetId: String?): List<UserTableRowDTO> {
         return dbQuery {
             UsersTable.selectAll()
                 .limit(USERS_LIMIT)
                 .map {
-                    it.toUserDTO()
+                    it.toUserTableRowDTO()
                 }
         }
     }
@@ -70,7 +70,7 @@ object UsersController {
         }
     }
 
-    private fun ResultRow.toUserDTO(): UserTableRowDTO {
+    private fun ResultRow.toUserTableRowDTO(): UserTableRowDTO {
         return UserTableRowDTO(
             id = this[UsersTable.id].value,
             name = this[UsersTable.name],

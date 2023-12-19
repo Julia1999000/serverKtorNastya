@@ -33,7 +33,7 @@ object FilesController {
 
     suspend fun selectImageById(imageId: UUID): FileImageTableRowDTO? {
         return dbQuery {
-            ImagesTable.select { ImagesTable.id eq imageId }.singleOrNull()?.toFileImageDTO()
+            ImagesTable.select { ImagesTable.id eq imageId }.singleOrNull()?.toFileImageTableRowDTO()
         }
     }
 
@@ -49,7 +49,7 @@ object FilesController {
         }
     }
 
-    private fun ResultRow.toFileImageDTO(): FileImageTableRowDTO {
+    private fun ResultRow.toFileImageTableRowDTO(): FileImageTableRowDTO {
         return FileImageTableRowDTO(
             id = this[ImagesTable.id].value,
             fileBytes = this[ImagesTable.file],

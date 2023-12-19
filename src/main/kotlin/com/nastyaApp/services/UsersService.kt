@@ -1,7 +1,7 @@
 package com.nastyaApp.services
 
 import com.nastyaApp.controllers.FilesController
-import com.nastyaApp.controllers.TokensController
+import com.nastyaApp.controllers.UserTokensController
 import com.nastyaApp.controllers.UsersController
 import com.nastyaApp.models.*
 import com.nastyaApp.utils.*
@@ -20,7 +20,7 @@ object UsersService {
 
             val userId = UsersController.insert(anonymDTO)
             val userDTO = UsersController.selectById(userId)
-            val token = TokensController.insert(userId)
+            val token = UserTokensController.insert(userId)
 
             val response = userDTO?.let {
                 IdentityUserResponse(it.id, it.name, generateImagUrl(it.avatarId), token)
@@ -34,14 +34,14 @@ object UsersService {
         }
     }
 
-    suspend fun login(call: ApplicationCall) {
+    suspend fun loginUser(call: ApplicationCall) {
         apiCatch(call) {
             val request = call.receive<LoginRequest>()
             val userDTO = UsersController.selectByLogin(request.login)
             if (userDTO != null) {
                 if (request.password == userDTO.password) {
-                    val token = TokensController.insert(userDTO.id)
-                    val response = IdentityUserResponse(userDTO.id, userDTO.name,  generateImagUrl(userDTO.avatarId), token)
+                    val token = UserTokensController.insert(userDTO.id)
+                    val response = IdentityUserResponse(userDTO.id, userDTO.name, generateImagUrl(userDTO.avatarId), token)
                     call.respond(HttpStatusCode.OK, response)
                 } else {
                     call.respond(HttpStatusCode.OK, "Invalid password")
@@ -55,7 +55,7 @@ object UsersService {
     suspend fun getAllUsers(call: ApplicationCall) {
         // TODO pagination
         apiCatch(call) {
-            val response = UsersController.selectAllUsers("").map {
+            val response = UsersController.selectAll("").map {
                 ShortUserResponse(it.id, it.name, generateImagUrl(it.avatarId))
             }
             call.respond(HttpStatusCode.OK, response)
@@ -64,7 +64,8 @@ object UsersService {
 
     suspend fun getFullUserById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = UUID.fromString(call.parameters["id"])
+            val id = getIdFromRequest(call) ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "User id not found")
+
             val userDTO = UsersController.selectById(id)
             if (userDTO != null) {
                 val listComs = listOf<Com>() // TODO get user's Coms
@@ -85,14 +86,14 @@ object UsersService {
 
     suspend fun updateUserInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = UUID.fromString(call.parameters["id"])
-            val token = getTokenFromHeaders(call)
+            val id = getIdFromRequest(call)
+            val token = getUserTokenFromHeaders(call)
 
             authHeaderHandle(call, token, id) {
                 val request = call.receive<UpdateUserInfoRequest>()
 
                 val newUserDTO = NewUserDTO(name = request.name, avatarId = request.avatarId)
-                UsersController.updateById(id, newUserDTO)
+                UsersController.updateById(id!!, newUserDTO)
 
                 UsersController.selectById(id)?.let {
                     ShortUserResponse(it.id, it.name, generateImagUrl(it.avatarId))
@@ -105,14 +106,14 @@ object UsersService {
 
     suspend fun updateUserSecretInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = UUID.fromString(call.parameters["id"])
-            val token = getTokenFromHeaders(call)
+            val id = getIdFromRequest(call)
+            val token = getUserTokenFromHeaders(call)
 
             authHeaderHandle(call, token, id) {
                 val request = call.receive<UpdateSecretInfoRequest>()
                 val newUserDTO = NewUserDTO(login = request.login, password = request.password)
 
-                UsersController.updateById(id, newUserDTO)
+                UsersController.updateById(id!!, newUserDTO)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -120,23 +121,23 @@ object UsersService {
 
     suspend fun delUserById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = UUID.fromString(call.parameters["id"])
-            val token = getTokenFromHeaders(call)
+            val id = getIdFromRequest(call)
+            val token = getUserTokenFromHeaders(call)
 
             authHeaderHandle(call, token, id) {
-                UsersController.deleteById(id)
+                UsersController.deleteById(id!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
     }
 
-    suspend fun unlog(call: ApplicationCall) {
+    suspend fun unloginUser(call: ApplicationCall) {
         apiCatch(call) {
-            val id = UUID.fromString(call.parameters["id"])
-            val token = getTokenFromHeaders(call)
+            val id = getIdFromRequest(call)
+            val token = getUserTokenFromHeaders(call)
 
             authHeaderHandle(call, token, id) {
-                TokensController.delete(token!!)
+                UserTokensController.delete(token!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -145,7 +146,7 @@ object UsersService {
     suspend fun delAvatar(call: ApplicationCall) {
         apiCatch(call) {
             val id = getIdFromRequest(call)
-            val token = getTokenFromHeaders(call)
+            val token = getUserTokenFromHeaders(call)
 
             authHeaderHandle(call, token, id) {
                 val userRow = UsersController.selectById(id!!)

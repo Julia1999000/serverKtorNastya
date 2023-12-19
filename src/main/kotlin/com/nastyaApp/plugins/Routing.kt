@@ -7,6 +7,7 @@ import io.ktor.server.routing.*
 fun Application.configureRouting() {
     routing {
         configureUsersRouting()
+        configureAdminsRouting()
         configureComsRouting()
         configureBoardsRouting()
         configureFilesRouting()

@@ -31,7 +31,7 @@ avatar_id UUID REFERENCES images (id) ON DELETE SET NULL
 );
 
 
-CREATE TABLE tokens(
+CREATE TABLE user_tokens(
 token UUID PRIMARY KEY NOT NULL,
 user_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
@@ -73,6 +73,21 @@ CREATE TABLE boards_to_coms(
 id UUID PRIMARY KEY NOT NULL,
 board_id UUID REFERENCES boards (id) ON DELETE CASCADE NOT NULL,
 com_id UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL
+);
+
+
+CREATE TABLE admins(
+id UUID PRIMARY KEY NOT NULL,
+name text NOT NULL,
+login text UNIQUE NOT NULL,
+password text NOT NULL,
+avatar_id UUID REFERENCES images (id) ON DELETE SET NULL
+);
+
+
+CREATE TABLE admin_tokens(
+token UUID PRIMARY KEY NOT NULL,
+admin_id UUID REFERENCES admins (id) ON DELETE CASCADE NOT NULL
 );
 
 
