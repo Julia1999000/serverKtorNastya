@@ -34,5 +34,13 @@ fun Route.configureUsersRouting() {
         get("/getAll") {
             UsersService.getAllUsers(call)
         }
+
+        delete("/unlog/{id}") {
+            UsersService.unlog(call)
+        }
+
+        delete("/delAvatar/{id}") {
+            UsersService.delAvatar(call)
+        }
     }
 }

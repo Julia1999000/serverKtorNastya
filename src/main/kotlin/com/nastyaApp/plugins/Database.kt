@@ -10,7 +10,7 @@ fun Application.configureDatabases() {
     val database = Database.connect("jdbc:postgresql://localhost:5432/nastyaapp", // TODO nameDB
         driver = "org.postgresql.Driver",
         user = "postgres",
-        password = "password" // TODO password
+        password = "2514" // TODO password
     )
 
     transaction {
