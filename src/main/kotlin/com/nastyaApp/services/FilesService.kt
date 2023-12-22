@@ -1,9 +1,7 @@
 package com.nastyaApp.services
 
 import com.nastyaApp.controllers.FilesController
-import com.nastyaApp.utils.apiCatch
-import com.nastyaApp.utils.getIdFromRequest
-import com.nastyaApp.utils.getUserTokenFromHeaders
+import com.nastyaApp.utils.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -13,10 +11,28 @@ import io.ktor.server.response.*
 object FilesService {
     private val ACCEPTED_IMAGE_TYPES = listOf("PNG", "JPG", "JPEG")
 
-    suspend fun uploadFile(call: ApplicationCall) {
+    suspend fun uploadFileByUser(call: ApplicationCall) {
         apiCatch(call) {
-            getUserTokenFromHeaders(call) ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Token not found")
+            val token = getUserTokenFromHeaders(call)
+            val id = getUserIdFromRequest(call)
+            authHeaderHandle(call, token, id) {
+                uploadFile(call)
+            }
+        }
+    }
 
+    suspend fun uploadFileByAdmin(call: ApplicationCall) {
+        apiCatch(call) {
+            val token = getAdminTokenFromHeaders(call)
+            val id = getAdminIdFromRequest(call)
+            adminHeaderHandle(call, token, id) {
+                uploadFile(call)
+            }
+        }
+    }
+
+    private suspend fun uploadFile(call: ApplicationCall) {
+        apiCatch(call) {
             val partsList = call.receiveMultipart().readAllParts()
             if (partsList.size > 1) {
                 return@apiCatch call.respond(HttpStatusCode.BadRequest, "A lot of data")
@@ -41,47 +57,44 @@ object FilesService {
 
     suspend fun downloadFileById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getIdFromRequest(call)
+            val id = getFileIdFromRequest(call)
             val fileImageDTO = id?.let { FilesController.selectImageById(id) }
 
-            if (fileImageDTO == null) {
-                call.respond(HttpStatusCode.NotFound, "File not found")
-            } else {
-                call.response.header(
-                    HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(
-                        ContentDisposition.Parameters.FileName, fileImageDTO.getFailName()
-                    ).toString()
-                )
+            fileImageDTO ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "File not found")
 
-                fileImageDTO.getFile().let {
-                    call.respondFile(it)
-                    it.delete()
-                }
+            call.response.header(
+                HttpHeaders.ContentDisposition,
+                ContentDisposition.Attachment.withParameter(
+                    ContentDisposition.Parameters.FileName, fileImageDTO.getFailName()
+                ).toString()
+            )
+
+            fileImageDTO.getFile().let {
+                call.respondFile(it)
+                it.delete()
             }
         }
     }
 
     suspend fun openFileById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getIdFromRequest(call)
+            val id = getFileIdFromRequest(call)
             val fileImageDTO = id?.let { FilesController.selectImageById(id) }
 
-            if (fileImageDTO == null) {
-                call.respond(HttpStatusCode.NotFound, "File not found")
-            } else {
-                call.response.header(
-                    HttpHeaders.ContentDisposition,
-                    ContentDisposition.Inline.withParameter(
-                        ContentDisposition.Parameters.FileName, fileImageDTO.getFailName()
-                    ).toString()
-                )
+            fileImageDTO ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "File not found")
 
-                fileImageDTO.getFile().let {
-                    call.respondFile(it)
-                    it.delete()
-                }
+            call.response.header(
+                HttpHeaders.ContentDisposition,
+                ContentDisposition.Inline.withParameter(
+                    ContentDisposition.Parameters.FileName, fileImageDTO.getFailName()
+                ).toString()
+            )
+
+            fileImageDTO.getFile().let {
+                call.respondFile(it)
+                it.delete()
             }
+
         }
     }
 

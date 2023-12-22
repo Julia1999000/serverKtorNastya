@@ -11,7 +11,7 @@ id character varying(6) PRIMARY KEY NOT NULL
 CREATE TABLE images(
 id UUID PRIMARY KEY NOT NULL,
 file bytea NOT NULL,
-type_id character varying(6) REFERENCES file_types (id) ON DELETE CASCADE
+type_id character varying(6) REFERENCES file_types (id) ON DELETE CASCADE NOT NULL
 );
 
 
@@ -37,12 +37,40 @@ user_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 
 
+CREATE TABLE admins(
+id UUID PRIMARY KEY NOT NULL,
+name text NOT NULL,
+login text UNIQUE NOT NULL,
+password text NOT NULL,
+avatar_id UUID REFERENCES images (id) ON DELETE SET NULL
+);
+
+
+CREATE TABLE admin_tokens(
+token UUID PRIMARY KEY NOT NULL,
+admin_id UUID REFERENCES admins (id) ON DELETE CASCADE NOT NULL
+);
+
+
+CREATE TABLE com_statuses(
+id character varying(10) PRIMARY KEY NOT NULL
+);
+
+
+INSERT INTO com_statuses
+VALUES
+('CREATED'),
+('PUBLISHED'),
+('CHECKABLE');
+
+
 CREATE TABLE coms(
 id UUID PRIMARY KEY NOT NULL,
 description text NOT NULL,
 image_id UUID REFERENCES images (id) ON DELETE SET NULL,
-create_date date NOT NULL,
-author_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+created_date date NOT NULL,
+author_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
+status_id character varying(10) REFERENCES com_statuses (id) ON DELETE RESTRICT NOT NULL
 );
 
 
@@ -51,7 +79,7 @@ id UUID PRIMARY KEY NOT NULL,
 text text NOT NULL,
 author_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
 com_id UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL,
-create_date date NOT NULL
+created_date date NOT NULL
 );
 
 
@@ -76,19 +104,43 @@ com_id UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL
 );
 
 
-CREATE TABLE admins(
-id UUID PRIMARY KEY NOT NULL,
-name text NOT NULL,
-login text UNIQUE NOT NULL,
-password text NOT NULL,
-avatar_id UUID REFERENCES images (id) ON DELETE SET NULL
-);
+
+CREATE OR REPLACE FUNCTION del_image_when_del_com()
+RETURNS trigger
+AS
+$func$
+BEGIN
+DELETE FROM public.images WHERE id = OLD.image_id;
+RETURN NULL;
+END
+$func$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER com_image_delete
+AFTER DELETE
+ON public.coms
+FOR EACH ROW
+WHEN (OLD.image_id IS NOT NULL)
+EXECUTE PROCEDURE del_image_when_del_com();
 
 
-CREATE TABLE admin_tokens(
-token UUID PRIMARY KEY NOT NULL,
-admin_id UUID REFERENCES admins (id) ON DELETE CASCADE NOT NULL
-);
+CREATE OR REPLACE FUNCTION del_image_when_del_user()
+RETURNS trigger
+AS
+$func$
+BEGIN
+DELETE FROM public.images WHERE id = OLD.avatar_id;
+RETURN NULL;
+END
+$func$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER user_image_delete
+AFTER DELETE
+ON public.users
+FOR EACH ROW
+WHEN (OLD.avatar_id IS NOT NULL)
+EXECUTE PROCEDURE del_image_when_del_user();
 
 
 */

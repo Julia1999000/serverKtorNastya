@@ -17,7 +17,7 @@ object CommentController {
         val text: Column<String> = text("text")
         val authorId: Column<EntityID<UUID>> = reference("author_id", UsersTable.id, ReferenceOption.CASCADE)
         val comId: Column<EntityID<UUID>> = reference("com_id", ComsTable.id, ReferenceOption.CASCADE)
-        val createDate: Column<LocalDateTime> = datetime("create_date").defaultExpression(CurrentDateTime)
+        val createdDate: Column<LocalDateTime> = datetime("created_date").defaultExpression(CurrentDateTime)
     }
 
 }

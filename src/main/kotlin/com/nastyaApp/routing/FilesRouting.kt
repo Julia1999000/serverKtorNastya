@@ -6,15 +6,19 @@ import io.ktor.server.routing.*
 
 fun Route.configureFilesRouting() {
     route("file") {
-        post("/images/upload") {
-            FilesService.uploadFile(call)
+        post("/images/uploadByUser/{user_id}") {
+            FilesService.uploadFileByUser(call)
         }
 
-        get("/images/download/{id}") {
+        post("/images/uploadByAdmin/{admin_id}") {
+            FilesService.uploadFileByAdmin(call)
+        }
+
+        get("/images/download/{file_id}") {
             FilesService.downloadFileById(call)
         }
 
-        get("/images/open/{id}") {
+        get("/images/open/{file_id}") {
             FilesService.openFileById(call)
         }
     }

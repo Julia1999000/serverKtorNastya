@@ -3,7 +3,6 @@ package com.nastyaApp.models
 import java.io.File
 import java.util.*
 
-
 class FileImageTableRowDTO(
     val id: UUID,
     val fileBytes: ByteArray,

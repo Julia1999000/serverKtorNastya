@@ -14,19 +14,19 @@ fun Route.configureAdminsRouting() {
             AdminsService.loginAdmin(call)
         }
 
-        get("/getInfo/{id}") {
+        get("/getInfo/{admin_id}") {
             AdminsService.getAdminById(call)
         }
 
-        put("/updateInfo/{id}") {
+        put("/updateInfo/{admin_id}") {
             AdminsService.updateAminInfoById(call)
         }
 
-        put("/updateSecretInfo/{id}") {
+        put("/updateSecretInfo/{admin_id}") {
             AdminsService.updateAdminSecretInfoById(call)
         }
 
-        delete("/del/{id}") {
+        delete("/del/{admin_id}") {
             AdminsService.delAdminById(call)
         }
 
@@ -34,11 +34,11 @@ fun Route.configureAdminsRouting() {
             AdminsService.getAllAdmins(call)
         }
 
-        delete("/unlogin/{id}") {
+        delete("/unlogin/{admin_id}") {
             AdminsService.unloginAdmin(call)
         }
 
-        delete("/delAvatar/{id}") {
+        delete("/delAvatar/{admin_id}") {
             AdminsService.delAvatar(call)
         }
 

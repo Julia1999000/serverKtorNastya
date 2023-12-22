@@ -56,11 +56,7 @@ object UsersController {
     //TODO pagination
     suspend fun selectAll(offsetId: String?): List<UserTableRowDTO> {
         return dbQuery {
-            UsersTable.selectAll()
-                .limit(USERS_LIMIT)
-                .map {
-                    it.toUserTableRowDTO()
-                }
+            UsersTable.selectAll().limit(USERS_LIMIT).map { it.toUserTableRowDTO() }
         }
     }
 

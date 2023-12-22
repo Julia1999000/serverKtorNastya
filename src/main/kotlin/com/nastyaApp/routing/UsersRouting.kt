@@ -15,19 +15,19 @@ fun Route.configureUsersRouting() {
             UsersService.loginUser(call)
         }
 
-        get("/getInfo/{id}") {
+        get("/getInfo/{user_id}") {
             UsersService.getFullUserById(call)
         }
 
-        put("/updateInfo/{id}") {
+        put("/updateInfo/{user_id}") {
             UsersService.updateUserInfoById(call)
         }
 
-        put("/updateSecretInfo/{id}") {
+        put("/updateSecretInfo/{user_id}") {
             UsersService.updateUserSecretInfoById(call)
         }
 
-        delete("/del/{id}") {
+        delete("/del/{user_id}") {
             UsersService.delUserById(call)
         }
 
@@ -35,11 +35,11 @@ fun Route.configureUsersRouting() {
             UsersService.getAllUsers(call)
         }
 
-        delete("/unlogin/{id}") {
+        delete("/unlogin/{user_id}") {
             UsersService.unloginUser(call)
         }
 
-        delete("/delAvatar/{id}") {
+        delete("/delAvatar/{user_id}") {
             UsersService.delAvatar(call)
         }
     }

@@ -39,8 +39,23 @@ private suspend fun isValidAdminToken(token: UUID, adminId: UUID): Boolean {
     return tokenRow != null && tokenRow.adminId == adminId
 }
 
-fun getIdFromRequest(call: ApplicationCall): UUID? {
-    val idStr = call.parameters["id"]
+fun getUserIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["user_id"]
+    return idStr?.let { UUID.fromString(it) }
+}
+
+fun getAdminIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["admin_id"]
+    return idStr?.let { UUID.fromString(it) }
+}
+
+fun getComIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["com_id"]
+    return idStr?.let { UUID.fromString(it) }
+}
+
+fun getFileIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["file_id"]
     return idStr?.let { UUID.fromString(it) }
 }
 

@@ -2,7 +2,7 @@ package com.nastyaApp.manual
 
 /* USERS
 
-    POST  http://127.0.0.1:8080/users/registration
+POST  http://127.0.0.1:8080/users/registration
     body (raw):
         {
             "name": "",
@@ -11,7 +11,7 @@ package com.nastyaApp.manual
         }
 
 
-    POST  http://127.0.0.1:8080/users/login
+POST  http://127.0.0.1:8080/users/login
     body (raw):
         {
             "login": "",
@@ -19,10 +19,10 @@ package com.nastyaApp.manual
         }
 
 
-    GET  http://127.0.0.1:8080/users/getInfo/{id}
+GET  http://127.0.0.1:8080/users/getInfo/{user_id}
 
 
-    PUT  http://127.0.0.1:8080/users/updateInfo/{id}
+PUT  http://127.0.0.1:8080/users/updateInfo/{user_id}
     headers:
         Bearer-Authorization: "token"
     body (raw):
@@ -32,7 +32,7 @@ package com.nastyaApp.manual
         }
 
 
-    PUT  http://127.0.0.1:8080/users/updateSecretInfo/{id}
+PUT  http://127.0.0.1:8080/users/updateSecretInfo/{user_id}
     headers:
         Bearer-Authorization: "token"
     body (raw):
@@ -42,20 +42,20 @@ package com.nastyaApp.manual
         }
 
 
-    DELETE  http://127.0.0.1:8080/users/del/{id}
+DELETE  http://127.0.0.1:8080/users/del/{user_id}
     headers:
         Bearer-Authorization: "token"
 
 
-    GET  http://127.0.0.1:8080/users/getAll
+GET  http://127.0.0.1:8080/users/getAll
 
 
-    DELETE  http://127.0.0.1:8080/users/unlogin/{id}
+DELETE  http://127.0.0.1:8080/users/unlogin/{user_id}
     headers:
         Bearer-Authorization: "token"
 
 
-    DELETE  http://127.0.0.1:8080/users/delAvatar/{id}
+DELETE  http://127.0.0.1:8080/users/delAvatar/{user_id}
     headers:
         Bearer-Authorization: "token"
 
@@ -72,7 +72,7 @@ POST  http://127.0.0.1:8080/admins/registration
         }
 
 
-    POST  http://127.0.0.1:8080/admins/login
+POST  http://127.0.0.1:8080/admins/login
     body (raw):
         {
             "login": "",
@@ -80,10 +80,10 @@ POST  http://127.0.0.1:8080/admins/registration
         }
 
 
-    GET  http://127.0.0.1:8080/admins/getInfo/{id}
+GET  http://127.0.0.1:8080/admins/getInfo/{admin_id}
 
 
-    PUT  http://127.0.0.1:8080/admins/updateInfo/{id}
+PUT  http://127.0.0.1:8080/admins/updateInfo/{admin_id}
     headers:
         Bearer-Administration: "token"
     body (raw):
@@ -93,7 +93,7 @@ POST  http://127.0.0.1:8080/admins/registration
         }
 
 
-    PUT  http://127.0.0.1:8080/admins/updateSecretInfo/{id}
+PUT  http://127.0.0.1:8080/admins/updateSecretInfo/{admin_id}
     headers:
         Bearer-Administration: "token"
     body (raw):
@@ -103,20 +103,20 @@ POST  http://127.0.0.1:8080/admins/registration
         }
 
 
-    DELETE  http://127.0.0.1:8080/admins/del/{id}
+DELETE  http://127.0.0.1:8080/admins/del/{admin_id}
     headers:
         Bearer-Administration: "token"
 
 
-    GET  http://127.0.0.1:8080/admins/getAll
+GET  http://127.0.0.1:8080/admins/getAll
 
 
-    DELETE  http://127.0.0.1:8080/admins/unlogin/{id}
+DELETE  http://127.0.0.1:8080/admins/unlogin/{admin_id}
     headers:
         Bearer-Administration: "token"
 
 
-    DELETE  http://127.0.0.1:8080/admins/delAvatar/{id}
+DELETE  http://127.0.0.1:8080/admins/delAvatar/{admin_id}
     headers:
         Bearer-Administration: "token"
 
@@ -124,7 +124,53 @@ POST  http://127.0.0.1:8080/admins/registration
 
 /* COMS
 
-    //TODO
+POST  http://127.0.0.1:8080/coms/createByUser/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+    body (raw):
+        {
+            "description": "",
+            "imageId": "" *
+        }
+
+
+GET  http://127.0.0.1:8080/coms/getAll/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+
+GET  http://127.0.0.1:8080/coms/getPublished/{user_id}
+
+
+GET  http://127.0.0.1:8080/coms/getInfoById/{com_id}
+
+
+PUT  http://127.0.0.1:8080/coms/publishByAdmin/{admin_id}/{com_id}
+    headers:
+        Bearer-Administration: "token"
+
+
+PUT  http://127.0.0.1:8080/coms/checkByAdmin/{admin_id}/{com_id}
+    headers:
+        Bearer-Administration: "token"
+
+
+DELETE  http://127.0.0.1:8080/coms/deleteByUser/{user_id}/{com_id}
+    headers:
+        Bearer-Authorization: "token"
+
+
+DELETE  http://127.0.0.1:8080/coms/deleteByAdmin/{admin_id}/{com_id}
+    headers:
+        Bearer-Administration: "token"
+
+
+GET  http://127.0.0.1:8080/coms/getAllPublished
+
+
+GET  http://127.0.0.1:8080/coms/getAllCreated/{admin_id}
+    headers:
+        Bearer-Administration: "token"
+
 
 * */
 
@@ -136,16 +182,23 @@ POST  http://127.0.0.1:8080/admins/registration
 
 /* FILE
 
-    POST  http://127.0.0.1:8080/file/images/upload
+POST  http://127.0.0.1:8080/file/images/uploadByUser/{user_id}
     headers:
         Bearer-Authorization: "token"
     body (form-data):
         file: FILE
 
 
-    GET  http://127.0.0.1:8080/file/images/download/{id}
+POST  http://127.0.0.1:8080/file/images/uploadByAdmin/{admin_id}
+    headers:
+        Bearer-Administration: "token"
+    body (form-data):
+        file: FILE
 
 
-    GET  http://127.0.0.1:8080/file/images/open/{id}
+GET  http://127.0.0.1:8080/file/images/download/{file_id}
+
+
+GET  http://127.0.0.1:8080/file/images/open/{file_id}
 
 * */
