@@ -1,9 +1,6 @@
 package com.nastyaApp.services
 
-import com.nastyaApp.controllers.ComsController
-import com.nastyaApp.controllers.FilesController
-import com.nastyaApp.controllers.UserTokensController
-import com.nastyaApp.controllers.UsersController
+import com.nastyaApp.controllers.*
 import com.nastyaApp.mappers.*
 import com.nastyaApp.models.*
 import com.nastyaApp.utils.*
@@ -61,7 +58,11 @@ object UsersService {
             val userDTO = UsersController.selectById(id)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "User not found")
 
-            val listComs = ComsController.selectPublishedByAuthorId(id).map { it.toShortComResponse() }
+            val listComs = ComsController.selectPublishedByAuthorId(id).map {
+                val countLikers = 0 // TODO get count Likers where comId == it.id
+                val countComments = CommentController.selectCountAllByComId(it.id)
+                it.toShortComResponse(countLikers, countComments)
+            }
             val listBoards = listOf<Board>() // TODO get user's Boards
             val response = userDTO.toFullUserResponse(listComs, listBoards)
             call.respond(HttpStatusCode.OK, response)

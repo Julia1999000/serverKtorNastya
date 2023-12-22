@@ -46,5 +46,6 @@ fun Route.configureComsRouting() {
         get("/getAllCreated/{admin_id}") {
             ComsService.getAllCreatedComs(call)
         }
+
     }
 }

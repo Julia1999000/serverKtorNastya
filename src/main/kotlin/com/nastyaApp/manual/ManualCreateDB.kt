@@ -68,7 +68,7 @@ CREATE TABLE coms(
 id UUID PRIMARY KEY NOT NULL,
 description text NOT NULL,
 image_id UUID REFERENCES images (id) ON DELETE SET NULL,
-created_date date NOT NULL,
+created_date timestamp NOT NULL,
 author_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
 status_id character varying(10) REFERENCES com_statuses (id) ON DELETE RESTRICT NOT NULL
 );
@@ -79,7 +79,7 @@ id UUID PRIMARY KEY NOT NULL,
 text text NOT NULL,
 author_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
 com_id UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL,
-created_date date NOT NULL
+created_date timestamp NOT NULL
 );
 
 

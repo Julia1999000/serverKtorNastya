@@ -11,5 +11,6 @@ fun Application.configureRouting() {
         configureComsRouting()
         configureBoardsRouting()
         configureFilesRouting()
+        configureCommentsRouting()
     }
 }

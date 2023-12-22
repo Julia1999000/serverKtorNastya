@@ -10,7 +10,7 @@ fun ComTableRowDTO.toShortComResponse(countLikers: Int = 0, countComments: Int =
         id = this.id,
         description = this.description,
         imageUrl = generateImagUrl(this.imageId),
-        createDate = this.createDate.epochSeconds,
+        createdDate = this.createdDate.epochSeconds,
         authorId = this.authorId,
         countLikers = countLikers,
         countComments = countComments,
@@ -22,7 +22,7 @@ fun ComRequest.toNewComDTO(authorId: UUID): NewComDTO {
     return NewComDTO(
         description = this.description,
         imageId = this.imageId,
-        createDate = Clock.System.now(),
+        createdDate = Clock.System.now(),
         authorId = authorId
     )
 }
@@ -32,7 +32,7 @@ fun ComTableRowDTO.toFullComResponse(likers: List<ShortUserResponse>, comments: 
         id = this.id,
         description = this.description,
         imageUrl = generateImagUrl(this.imageId),
-        createDate = this.createDate.epochSeconds,
+        createdDate = this.createdDate.epochSeconds,
         authorId = this.authorId,
         likers = likers,
         comments = comments,

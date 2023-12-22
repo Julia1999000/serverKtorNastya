@@ -18,7 +18,7 @@ data class ShortComResponse(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     val description: String,
     val imageUrl: String? = null,
-    val createDate: Long,
+    val createdDate: Long,
     @Serializable(with = UUIDSerializer::class) val authorId: UUID,
     val countLikers: Int,
     val countComments: Int,
@@ -30,7 +30,7 @@ data class FullComResponse(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     val description: String,
     val imageUrl: String? = null,
-    val createDate: Long,
+    val createdDate: Long,
     @Serializable(with = UUIDSerializer::class) val authorId: UUID,
     val likers: List<ShortUserResponse>,
     val comments: List<CommentResponse>,
@@ -43,7 +43,7 @@ data class ComTableRowDTO(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     val description: String,
     @Serializable(with = UUIDSerializer::class) val imageId: UUID? = null,
-    val createDate: Instant,
+    val createdDate: Instant,
     @Serializable(with = UUIDSerializer::class) val authorId: UUID,
     val status: String
 )
@@ -52,7 +52,7 @@ data class ComTableRowDTO(
 data class NewComDTO(
     val description: String,
     @Serializable(with = UUIDSerializer::class) val imageId: UUID? = null,
-    val createDate: Instant,
+    val createdDate: Instant,
     @Serializable(with = UUIDSerializer::class) val authorId: UUID
 )
 

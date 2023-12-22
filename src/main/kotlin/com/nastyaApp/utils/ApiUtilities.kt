@@ -59,6 +59,11 @@ fun getFileIdFromRequest(call: ApplicationCall): UUID? {
     return idStr?.let { UUID.fromString(it) }
 }
 
+fun getCommentIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["comment_id"]
+    return idStr?.let { UUID.fromString(it) }
+}
+
 fun getUserTokenFromHeaders(call: ApplicationCall): UUID? {
     val tokenStr = call.request.headers["Bearer-Authorization"]
     return tokenStr?.let { UUID.fromString(it) }

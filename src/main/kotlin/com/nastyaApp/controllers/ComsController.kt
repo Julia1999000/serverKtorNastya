@@ -40,7 +40,7 @@ object ComsController {
                 ComsTable.insertAndGetId {
                     it[this.description] = com.description
                     it[this.imageId] = com.imageId
-                    it[this.createdDate] = com.createDate
+                    it[this.createdDate] = com.createdDate
                     it[this.authorId] = com.authorId
                     it[this.statusId] = statusId
                 }.value
@@ -121,7 +121,7 @@ object ComsController {
             id = this[ComsTable.id].value,
             description = this[ComsTable.description],
             imageId = this[ComsTable.imageId]?.value,
-            createDate = this[ComsTable.createdDate],
+            createdDate = this[ComsTable.createdDate],
             authorId = this[ComsTable.authorId].value,
             status = this[ComsTable.statusId].value
         )

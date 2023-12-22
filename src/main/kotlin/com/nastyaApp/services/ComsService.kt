@@ -1,6 +1,8 @@
 package com.nastyaApp.services
 
+import com.nastyaApp.controllers.CommentController
 import com.nastyaApp.controllers.ComsController
+import com.nastyaApp.mappers.toCommentResponse
 import com.nastyaApp.mappers.toFullComResponse
 import com.nastyaApp.mappers.toNewComDTO
 import com.nastyaApp.mappers.toShortComResponse
@@ -40,7 +42,7 @@ object ComsService {
             authHeaderHandle(call, token, id) {
                 val response = ComsController.selectAllByAuthorId(id!!).map {
                     val countLikers = 0 // TODO get count Likers where comId == it.id
-                    val countComments = 0 // TODO get count Comments where comId == it.id
+                    val countComments = CommentController.selectCountAllByComId(it.id)
                     it.toShortComResponse(countLikers, countComments)
                 }
                 call.respond(HttpStatusCode.OK, response)
@@ -55,7 +57,7 @@ object ComsService {
 
             val response = ComsController.selectPublishedByAuthorId(id).map {
                 val countLikers = 0 // TODO get count Likers where comId == it.id
-                val countComments = 0 // TODO get count Comments where comId == it.id
+                val countComments = CommentController.selectCountAllByComId(it.id)
                 it.toShortComResponse(countLikers, countComments)
             }
             call.respond(HttpStatusCode.OK, response)
@@ -71,7 +73,7 @@ object ComsService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com not found")
 
             val listLikers = listOf<ShortUserResponse>() // TODO get Likers where comId == comDTO.id
-            val listComments = listOf<CommentResponse>() // TODO get Comments where comId == comDTO.id
+            val listComments = CommentController.selectAllByComId(comDTO.id).map { it.toCommentResponse() }
             val response = comDTO.toFullComResponse(listLikers, listComments)
             call.respond(HttpStatusCode.OK, response)
         }
@@ -138,8 +140,8 @@ object ComsService {
             // TODO pagination
             val response = ComsController.selectAllPublished("").map {
                 val countLikers = 0 // TODO get count Likers where comId == it.id
-                val countComments = 0 // TODO get count Comments where comId == it.id
-                it.toShortComResponse()
+                val countComments = CommentController.selectCountAllByComId(it.id)
+                it.toShortComResponse(countLikers, countComments)
             }
             call.respond(HttpStatusCode.OK, response)
         }
@@ -154,8 +156,8 @@ object ComsService {
                 // TODO pagination
                 val response = ComsController.selectAllCreated("").map {
                     val countLikers = 0 // TODO get count Likers where comId == it.id
-                    val countComments = 0 // TODO get count Comments where comId == it.id
-                    it.toShortComResponse()
+                    val countComments = CommentController.selectCountAllByComId(it.id)
+                    it.toShortComResponse(countLikers, countComments)
                 }
                 call.respond(HttpStatusCode.OK, response)
             }

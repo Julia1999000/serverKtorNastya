@@ -134,11 +134,11 @@ POST  http://127.0.0.1:8080/coms/createByUser/{user_id}
         }
 
 
-GET  http://127.0.0.1:8080/coms/getAll/{user_id}
+GET  http://127.0.0.1:8080/coms/getAllByUser/{user_id}
     headers:
         Bearer-Authorization: "token"
 
-GET  http://127.0.0.1:8080/coms/getPublished/{user_id}
+GET  http://127.0.0.1:8080/coms/getPublishedByUser/{user_id}
 
 
 GET  http://127.0.0.1:8080/coms/getInfoById/{com_id}
@@ -177,6 +177,30 @@ GET  http://127.0.0.1:8080/coms/getAllCreated/{admin_id}
 /* BOARDS
 
     //TODO
+
+* */
+
+/* COMMENTS
+
+POST  http://127.0.0.1:8080/comments/create/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+    body (raw):
+        {
+            "authorId": "",
+            "comId": "",
+            "text": ""
+        }
+
+
+DELETE  http://127.0.0.1:8080/comments/deleteByUser/{user_id}/{comment_id}
+    headers:
+        Bearer-Authorization: "token"
+
+
+DELETE  http://127.0.0.1:8080/comments/deleteByAdmin/{admin_id}/{comment_id}
+    headers:
+        Bearer-Administration: "token"
 
 * */
 
