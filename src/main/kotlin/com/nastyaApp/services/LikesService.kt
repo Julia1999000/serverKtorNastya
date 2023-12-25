@@ -1,7 +1,9 @@
 package com.nastyaApp.services
 
 import com.nastyaApp.controllers.LikesController
+import com.nastyaApp.controllers.UsersController
 import com.nastyaApp.mappers.toLikeResponse
+import com.nastyaApp.mappers.toShortUserResponse
 import com.nastyaApp.utils.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -42,6 +44,18 @@ object LikesService {
                 LikesController.deleteLikeById(likeDTO.id)
                 call.respond(HttpStatusCode.OK)
             }
+        }
+    }
+
+    suspend fun gelAllLikersByCom(call: ApplicationCall) {
+        apiCatch(call) {
+            val comId = getComIdFromRequest(call)
+                ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
+
+            val response = LikesController.selectAllLikesByComId(comId).mapNotNull { like ->
+                UsersController.selectUserById(like.likerId)?.toShortUserResponse()
+            }
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 

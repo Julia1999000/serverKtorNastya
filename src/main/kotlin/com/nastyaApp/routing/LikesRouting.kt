@@ -15,5 +15,9 @@ fun Route.configureLikesRouting() {
             LikesService.deleteLike(call)
         }
 
+        get("/getAllByCom/{com_id}") {
+            LikesService.gelAllLikersByCom(call)
+        }
+
     }
 }

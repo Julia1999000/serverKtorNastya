@@ -2,6 +2,7 @@ package com.nastyaApp.services
 
 import com.nastyaApp.controllers.CommentController
 import com.nastyaApp.controllers.ComsController
+import com.nastyaApp.controllers.UsersController
 import com.nastyaApp.mappers.toCommentResponse
 import com.nastyaApp.mappers.toNewCommentDTO
 import com.nastyaApp.models.CreateCommentRequest
@@ -25,7 +26,8 @@ object CommentService {
                 val newCommentId = CommentController.insertComment(newCommentDTO)
                 val commentDTO = CommentController.selectCommentById(newCommentId)
 
-                val response = commentDTO?.toCommentResponse()
+                val userDTO = UsersController.selectUserById(userId!!)
+                val response = userDTO?.let { commentDTO?.toCommentResponse(it.avatarId, it.name) }
                 if (response != null) {
                     call.respond(HttpStatusCode.Created, response)
                 }
@@ -68,6 +70,20 @@ object CommentService {
                 CommentController.deleteCommentById(commentId)
                 call.respond(HttpStatusCode.OK)
             }
+        }
+    }
+
+    suspend fun getAllCommentsByCom(call: ApplicationCall) {
+        apiCatch(call) {
+            val comId = getComIdFromRequest(call)
+                ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
+
+            val response = CommentController.selectAllCommentsByComId(comId).mapNotNull { commentDTO ->
+                UsersController.selectUserById(commentDTO.authorId)?.let { authorDTO ->
+                    commentDTO.toCommentResponse(authorDTO.avatarId, authorDTO.name)
+                }
+            }
+            call.respond(HttpStatusCode.OK, response)
         }
     }
 

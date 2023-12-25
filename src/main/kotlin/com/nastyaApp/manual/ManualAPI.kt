@@ -214,6 +214,14 @@ DELETE  http://127.0.0.1:8080/boards/removeCom/{user_id}/{board_id}/{com_id}
     headers:
         Bearer-Authorization: "token"
 
+
+GET  http://127.0.0.1:8080/boards/getAllComsByBoard/{board_id}
+
+
+GET  http://127.0.0.1:8080/boards/getAllBoardsByUser/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+
 * */
 
 /* LIKES
@@ -226,6 +234,10 @@ POST  http://127.0.0.1:8080/likes/set/{user_id}/{com_id}
 DELETE  http://127.0.0.1:8080/likes/remove/{user_id}/{com_id}
     headers:
         Bearer-Authorization: "token"
+
+
+GET  http://127.0.0.1:8080/likes/getAllByCom/{com_id}
+
 
 * */
 
@@ -250,6 +262,10 @@ DELETE  http://127.0.0.1:8080/comments/deleteByUser/{user_id}/{comment_id}
 DELETE  http://127.0.0.1:8080/comments/deleteByAdmin/{admin_id}/{comment_id}
     headers:
         Bearer-Administration: "token"
+
+
+GET  http://127.0.0.1:8080/comments/getAllByCom/{com_id}
+
 
 * */
 

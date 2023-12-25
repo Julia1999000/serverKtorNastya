@@ -19,5 +19,8 @@ fun Route.configureCommentsRouting() {
             CommentService.deleteCommentByAdmin(call)
         }
 
+        get("/getAllByCom/{com_id}") {
+            CommentService.getAllCommentsByCom(call)
+        }
     }
 }

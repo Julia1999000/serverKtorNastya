@@ -19,6 +19,8 @@ data class CommentResponse(
     @Serializable(with = UUIDSerializer::class) val comId: UUID,
     val text: String,
     val createdDate: Long,
+    val authorAvatarUrl: String? = null,
+    val authorName: String,
 )
 
 @Serializable

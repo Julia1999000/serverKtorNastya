@@ -1,6 +1,5 @@
 package com.nastyaApp.controllers
 
-import com.nastyaApp.controllers.ComsController.ComStatusesTable.entityId
 import com.nastyaApp.controllers.ComsController.ComsTable
 import com.nastyaApp.controllers.UsersController.UsersTable
 import com.nastyaApp.models.*
@@ -71,6 +70,12 @@ object BoardController {
         }
     }
 
+    suspend fun selectAllBoardsByUserId(userId: UUID): List<BoardTableRowDTO> {
+        return dbQuery {
+            BoardsTable.select { BoardsTable.ownerId eq userId }.map { it.toBoardTableRowDTO() }
+        }
+    }
+
     suspend fun updateBoardById(boardId: UUID, board: BoardForUpdateDTO) {
         return dbQuery {
             val newStatusId = board.status?.let { selectBoardStatusId(it) }
@@ -100,6 +105,12 @@ object BoardController {
     suspend fun selectBoardToComById(boardToComId: UUID): BoardToComTableRowDTO? {
         return dbQuery {
             BoardsToComsTable.select { BoardsToComsTable.id eq boardToComId }.singleOrNull()?.toBoardToComTableRowDTO()
+        }
+    }
+
+    suspend fun selectAllComByBoard(boardId: UUID): List<BoardToComTableRowDTO> {
+        return dbQuery {
+            BoardsToComsTable.select { BoardsToComsTable.boardId eq boardId }.map { it.toBoardToComTableRowDTO() }
         }
     }
 

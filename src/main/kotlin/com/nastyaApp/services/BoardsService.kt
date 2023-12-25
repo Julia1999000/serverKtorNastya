@@ -1,10 +1,10 @@
 package com.nastyaApp.services
 
 import com.nastyaApp.controllers.BoardController
-import com.nastyaApp.mappers.toBoardForUpdateDTO
-import com.nastyaApp.mappers.toBoardResponse
-import com.nastyaApp.mappers.toBoardToComResponse
-import com.nastyaApp.mappers.toNewBoardDTO
+import com.nastyaApp.controllers.CommentController
+import com.nastyaApp.controllers.ComsController
+import com.nastyaApp.controllers.LikesController
+import com.nastyaApp.mappers.*
 import com.nastyaApp.models.ComToBoardRequest
 import com.nastyaApp.models.CreateBoardRequest
 import com.nastyaApp.models.UpdateBoardRequest
@@ -137,4 +137,30 @@ object BoardsService {
         }
     }
 
+    suspend fun getAllComsByBoadr(call: ApplicationCall) {
+        apiCatch(call) {
+            val boardId = getBoardIdFromRequest(call)
+                ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Board id not found")
+
+            val response = BoardController.selectAllComByBoard(boardId).mapNotNull {
+                val likersCount = LikesController.selectCountAllLikesByComId(it.comId)
+                val commentsCount = CommentController.selectCountAllCommentsByComId(it.comId)
+                ComsController.selectComById(it.comId)?.toShortComResponse(likersCount, commentsCount)
+            }
+
+            call.respond(HttpStatusCode.OK, response)
+        }
+    }
+
+    suspend fun getAllBoardsBuUser(call: ApplicationCall) {
+        apiCatch(call) {
+            val userId = getUserIdFromRequest(call)
+            val token = getUserTokenFromHeaders(call)
+
+            authHeaderHandle(call, token, userId) {
+                val response = BoardController.selectAllBoardsByUserId(userId!!)
+                call.respond(HttpStatusCode.OK, response)
+            }
+        }
+    }
 }

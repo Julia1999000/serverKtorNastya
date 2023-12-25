@@ -65,16 +65,22 @@ object ComsService {
 
     suspend fun getFullInfoCom(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getComIdFromRequest(call)
+            val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            val comDTO = ComsController.selectComById(userId)
+            val comDTO = ComsController.selectComById(comId)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com not found")
 
             val listLikers = LikesController.selectAllLikesByComId(comDTO.id).mapNotNull { like ->
                 UsersController.selectUserById(like.likerId)?.toShortUserResponse()
             }
-            val listComments = CommentController.selectAllCommentsByComId(comDTO.id).map { it.toCommentResponse() }
+
+            val authorDTO = UsersController.selectUserById(comDTO.authorId)
+
+            val listComments = CommentController.selectAllCommentsByComId(comDTO.id).mapNotNull { commentDTO ->
+                authorDTO?.let { commentDTO.toCommentResponse(it.avatarId, it.name) }
+            }
+
             val response = comDTO.toFullComResponse(listLikers, listComments)
             call.respond(HttpStatusCode.OK, response)
         }

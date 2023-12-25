@@ -27,5 +27,13 @@ fun Route.configureBoardsRouting() {
             BoardsService.deleteComFromBoard(call)
         }
 
+        get("/getAllComsByBoard/{board_id}") {
+            BoardsService.getAllComsByBoadr(call)
+        }
+
+        get("/getAllBoardsByUser/{user_id}") {
+            BoardsService.getAllBoardsBuUser(call)
+        }
+
     }
 }
