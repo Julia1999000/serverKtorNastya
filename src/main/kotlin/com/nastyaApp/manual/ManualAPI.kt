@@ -180,6 +180,19 @@ GET  http://127.0.0.1:8080/coms/getAllCreated/{admin_id}
 
 * */
 
+/* LIKES
+
+POST  http://127.0.0.1:8080/likes/set/{user_id}/{com_id}
+    headers:
+        Bearer-Authorization: "token"
+
+
+DELETE  http://127.0.0.1:8080/likes/remove/{user_id}/{com_id}
+    headers:
+        Bearer-Authorization: "token"
+
+* */
+
 /* COMMENTS
 
 POST  http://127.0.0.1:8080/comments/create/{user_id}

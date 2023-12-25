@@ -12,5 +12,6 @@ fun Application.configureRouting() {
         configureBoardsRouting()
         configureFilesRouting()
         configureCommentsRouting()
+        configureLikesRouting()
     }
 }

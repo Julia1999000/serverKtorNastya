@@ -59,7 +59,7 @@ object UsersService {
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "User not found")
 
             val listComs = ComsController.selectPublishedByAuthorId(id).map {
-                val countLikers = 0 // TODO get count Likers where comId == it.id
+                val countLikers = LikesController.selectCountAllByComId(it.id)
                 val countComments = CommentController.selectCountAllByComId(it.id)
                 it.toShortComResponse(countLikers, countComments)
             }
