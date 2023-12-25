@@ -14,8 +14,8 @@ object FilesService {
     suspend fun uploadFileByUser(call: ApplicationCall) {
         apiCatch(call) {
             val token = getUserTokenFromHeaders(call)
-            val id = getUserIdFromRequest(call)
-            authHeaderHandle(call, token, id) {
+            val userId = getUserIdFromRequest(call)
+            authHeaderHandle(call, token, userId) {
                 uploadFile(call)
             }
         }
@@ -24,8 +24,8 @@ object FilesService {
     suspend fun uploadFileByAdmin(call: ApplicationCall) {
         apiCatch(call) {
             val token = getAdminTokenFromHeaders(call)
-            val id = getAdminIdFromRequest(call)
-            adminHeaderHandle(call, token, id) {
+            val adminId = getAdminIdFromRequest(call)
+            adminHeaderHandle(call, token, adminId) {
                 uploadFile(call)
             }
         }
@@ -48,8 +48,8 @@ object FilesService {
                 }
 
                 val fileBytes = part.streamProvider().readBytes()
-                fileType?.let { FilesController.insertImage(fileBytes, it) }?.let { id ->
-                    call.respond(HttpStatusCode.Created, id)
+                fileType?.let { FilesController.insertImage(fileBytes, it) }?.let { imageId ->
+                    call.respond(HttpStatusCode.Created, imageId)
                 }
             }
         }
@@ -57,8 +57,8 @@ object FilesService {
 
     suspend fun downloadFileById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getFileIdFromRequest(call)
-            val fileImageDTO = id?.let { FilesController.selectImageById(id) }
+            val fileId = getFileIdFromRequest(call)
+            val fileImageDTO = fileId?.let { FilesController.selectImageById(fileId) }
 
             fileImageDTO ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "File not found")
 
@@ -78,8 +78,8 @@ object FilesService {
 
     suspend fun openFileById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getFileIdFromRequest(call)
-            val fileImageDTO = id?.let { FilesController.selectImageById(id) }
+            val fileId = getFileIdFromRequest(call)
+            val fileImageDTO = fileId?.let { FilesController.selectImageById(fileId) }
 
             fileImageDTO ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "File not found")
 

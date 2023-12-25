@@ -23,7 +23,7 @@ object CommentController {
         val createdDate: Column<Instant> = timestamp("created_date").defaultExpression(CurrentTimestamp())
     }
 
-    suspend fun insert(comment: NewCommentDTO): UUID {
+    suspend fun insertComment(comment: NewCommentDTO): UUID {
         return dbQuery {
             CommentsTable.insertAndGetId {
                 it[this.text] = comment.text
@@ -34,29 +34,29 @@ object CommentController {
         }
     }
 
-    suspend fun deleteById(id: UUID) {
+    suspend fun deleteCommentById(commentId: UUID) {
         return dbQuery {
-            CommentsTable.deleteWhere { this.id eq id }
+            CommentsTable.deleteWhere { this.id eq commentId }
         }
     }
 
-    suspend fun selectById(id: UUID): CommentTableRowDTO? {
+    suspend fun selectCommentById(commentId: UUID): CommentTableRowDTO? {
         return dbQuery {
-            CommentsTable.select { CommentsTable.id eq id }.singleOrNull()?.toCommentTableRowDTO()
+            CommentsTable.select { CommentsTable.id eq commentId }.singleOrNull()?.toCommentTableRowDTO()
         }
     }
 
-    suspend fun selectAllByComId(id: UUID): List<CommentTableRowDTO> {
+    suspend fun selectAllCommentsByComId(comId: UUID): List<CommentTableRowDTO> {
         return dbQuery {
-            CommentsTable.select { CommentsTable.comId eq id }
+            CommentsTable.select { CommentsTable.comId eq comId }
                 .orderBy(CommentsTable.createdDate to SortOrder.DESC)
                 .map { it.toCommentTableRowDTO() }
         }
     }
 
-    suspend fun selectCountAllByComId(id: UUID): Int {
+    suspend fun selectCountAllCommentsByComId(comId: UUID): Int {
         return dbQuery {
-            CommentsTable.select { CommentsTable.comId eq id }.count().toInt()
+            CommentsTable.select { CommentsTable.comId eq comId }.count().toInt()
         }
     }
 

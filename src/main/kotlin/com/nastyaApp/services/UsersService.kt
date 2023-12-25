@@ -16,9 +16,9 @@ object UsersService {
             val request = call.receive<RegistrationRequest>()
             val anonymDTO = request.toAnonymDTO()
 
-            val userId = UsersController.insert(anonymDTO)
-            val userDTO = UsersController.selectById(userId)
-            val token = UserTokensController.insert(userId)
+            val userId = UsersController.insertUser(anonymDTO)
+            val userDTO = UsersController.selectUserById(userId)
+            val token = UserTokensController.insertUserToken(userId)
 
             userDTO?.toIdentityUserResponse(token)?.let { response ->
                 call.respond(HttpStatusCode.Created, response)
@@ -29,14 +29,14 @@ object UsersService {
     suspend fun loginUser(call: ApplicationCall) {
         apiCatch(call) {
             val request = call.receive<LoginRequest>()
-            val userDTO = UsersController.selectByLogin(request.login)
+            val userDTO = UsersController.selectUserByLogin(request.login)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Login not found")
 
             if (request.password != userDTO.password) {
                 return@apiCatch call.respond(HttpStatusCode.OK, "Invalid password")
             }
 
-            val token = UserTokensController.insert(userDTO.id)
+            val token = UserTokensController.insertUserToken(userDTO.id)
             val response = userDTO.toIdentityUserResponse(token)
             call.respond(HttpStatusCode.OK, response)
         }
@@ -45,25 +45,27 @@ object UsersService {
     suspend fun getAllUsers(call: ApplicationCall) {
         // TODO pagination
         apiCatch(call) {
-            val response = UsersController.selectAll("").map { it.toShortUserResponse() }
+            val response = UsersController.selectAllUsers("").map { it.toShortUserResponse() }
             call.respond(HttpStatusCode.OK, response)
         }
     }
 
     suspend fun getFullUserById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "User id not found")
 
-            val userDTO = UsersController.selectById(id)
+            val userDTO = UsersController.selectUserById(userId)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "User not found")
 
-            val listComs = ComsController.selectPublishedByAuthorId(id).map {
-                val countLikers = LikesController.selectCountAllByComId(it.id)
-                val countComments = CommentController.selectCountAllByComId(it.id)
-                it.toShortComResponse(countLikers, countComments)
+            val listComs = ComsController.selectPublishedComsByAuthorId(userId).map { com ->
+                val countLikers = LikesController.selectCountAllLikesByComId(com.id)
+                val countComments = CommentController.selectCountAllCommentsByComId(com.id)
+                com.toShortComResponse(countLikers, countComments)
             }
-            val listBoards = listOf<Board>() // TODO get user's Boards
+            val listBoards = BoardController.selectAllPublicBoardsByUserId(userId).map {
+                it.toBoardResponse()
+            }
             val response = userDTO.toFullUserResponse(listComs, listBoards)
             call.respond(HttpStatusCode.OK, response)
         }
@@ -71,15 +73,15 @@ object UsersService {
 
     suspend fun updateUserInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, id) {
+            authHeaderHandle(call, token, userId) {
                 val request = call.receive<UpdateUserInfoRequest>()
                 val newUserDTO = request.toNewUserDTO()
 
-                UsersController.updateById(id!!, newUserDTO)
-                UsersController.selectById(id)?.toShortUserResponse()?.let {
+                UsersController.updateUserById(userId!!, newUserDTO)
+                UsersController.selectUserById(userId)?.toShortUserResponse()?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
             }
@@ -88,14 +90,14 @@ object UsersService {
 
     suspend fun updateUserSecretInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, id) {
+            authHeaderHandle(call, token, userId) {
                 val request = call.receive<UpdateSecretInfoRequest>()
                 val newUserDTO = request.toNewUserDTO()
 
-                UsersController.updateById(id!!, newUserDTO)
+                UsersController.updateUserById(userId!!, newUserDTO)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -103,11 +105,11 @@ object UsersService {
 
     suspend fun delUserById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, id) {
-                UsersController.deleteById(id!!)
+            authHeaderHandle(call, token, userId) {
+                UsersController.deleteUserById(userId!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -115,11 +117,11 @@ object UsersService {
 
     suspend fun unloginUser(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, id) {
-                UserTokensController.delete(token!!)
+            authHeaderHandle(call, token, userId) {
+                UserTokensController.deleteUserToken(token!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -127,11 +129,11 @@ object UsersService {
 
     suspend fun delAvatar(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getUserIdFromRequest(call)
+            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, id) {
-                val userRow = UsersController.selectById(id!!)
+            authHeaderHandle(call, token, userId) {
+                val userRow = UsersController.selectUserById(userId!!)
 
                 userRow?.avatarId?.let { avatarId ->
                     FilesController.deleteImageById(avatarId)

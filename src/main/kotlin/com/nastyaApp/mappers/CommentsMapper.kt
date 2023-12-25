@@ -1,12 +1,12 @@
 package com.nastyaApp.mappers
 
-import com.nastyaApp.models.CommentRequest
 import com.nastyaApp.models.CommentResponse
 import com.nastyaApp.models.CommentTableRowDTO
+import com.nastyaApp.models.CreateCommentRequest
 import com.nastyaApp.models.NewCommentDTO
 import kotlinx.datetime.Clock
 
-fun CommentRequest.toNewCommentDTO(): NewCommentDTO {
+fun CreateCommentRequest.toNewCommentDTO(): NewCommentDTO {
     return NewCommentDTO(
         authorId = this.authorId,
         comId = this.comId,

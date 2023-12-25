@@ -29,21 +29,21 @@ object AdminsController {
         }
     }
 
-    suspend fun selectById(id: UUID): AdminTableRowDTO? {
+    suspend fun selectAdminById(adminId: UUID): AdminTableRowDTO? {
         return dbQuery {
-            AdminsTable.select { AdminsTable.id eq id }.singleOrNull()?.toAdminTableRowDTO()
+            AdminsTable.select { AdminsTable.id eq adminId }.singleOrNull()?.toAdminTableRowDTO()
         }
     }
 
-    suspend fun selectByLogin(login: String): AdminTableRowDTO? {
+    suspend fun selectAdminByLogin(login: String): AdminTableRowDTO? {
         return dbQuery {
             AdminsTable.select { AdminsTable.login eq login }.singleOrNull()?.toAdminTableRowDTO()
         }
     }
 
-    suspend fun updateById(id: UUID, newAdmin: NewAdminDTO) {
+    suspend fun updateAdminById(adminId: UUID, newAdmin: NewAdminDTO) {
         dbQuery {
-            AdminsTable.update({ AdminsTable.id eq id }) {
+            AdminsTable.update({ AdminsTable.id eq adminId }) {
                 newAdmin.name?.let { newName -> it[this.name] = newName }
                 newAdmin.login?.let { newLogin -> it[this.login] = newLogin }
                 newAdmin.password?.let { newPassword -> it[this.password] = newPassword }
@@ -52,15 +52,15 @@ object AdminsController {
         }
     }
 
-    suspend fun selectAll(): List<AdminTableRowDTO> {
+    suspend fun selectAllAdmins(): List<AdminTableRowDTO> {
         return dbQuery {
             AdminsTable.selectAll().map { it.toAdminTableRowDTO() }
         }
     }
 
-    suspend fun deleteById(id: UUID) {
+    suspend fun deleteAdminById(adminId: UUID) {
         dbQuery {
-            AdminsTable.deleteWhere { this.id eq id }
+            AdminsTable.deleteWhere { this.id eq adminId }
         }
     }
 

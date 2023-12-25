@@ -16,9 +16,9 @@ import java.util.UUID
 
 object ComsController {
 
-    private const val COM_STATUS_CREATED = "CREATED"
-    private const val COM_STATUS_PUBLISHED = "PUBLISHED"
-    private const val COM_STATUS_CHECKABLE = "CHECKABLE"
+    private const val CREATED_STATUS_COM = "CREATED"
+    private const val PUBLISHED_STATUS_COM = "PUBLISHED"
+    private const val CHECKABLE_STATUS_COM = "CHECKABLE"
     private const val COMS_LIMIT = 20 // TODO for pagination
 
     object ComStatusesTable : IdTable<String>("com_statuses") {
@@ -34,9 +34,9 @@ object ComsController {
         val statusId: Column<EntityID<String>> = reference("status_id", ComStatusesTable.id, ReferenceOption.RESTRICT)
     }
 
-    suspend fun insert(com: NewComDTO): UUID? {
+    suspend fun insertCom(com: NewComDTO): UUID? {
         return dbQuery {
-            selectComStatusId(COM_STATUS_CREATED)?.let { statusId ->
+            selectComStatusId(CREATED_STATUS_COM)?.let { statusId ->
                 ComsTable.insertAndGetId {
                     it[this.description] = com.description
                     it[this.imageId] = com.imageId
@@ -54,13 +54,13 @@ object ComsController {
         }
     }
 
-    suspend fun selectById(id: UUID): ComTableRowDTO? {
+    suspend fun selectComById(comId: UUID): ComTableRowDTO? {
         return dbQuery {
-            ComsTable.select { ComsTable.id eq id }.singleOrNull()?.toComTableRowDTO()
+            ComsTable.select { ComsTable.id eq comId }.singleOrNull()?.toComTableRowDTO()
         }
     }
 
-    suspend fun selectAllByAuthorId(authorId: UUID): List<ComTableRowDTO> {
+    suspend fun selectAllComsByAuthorId(authorId: UUID): List<ComTableRowDTO> {
         return dbQuery {
             ComsTable.select { ComsTable.authorId eq authorId }.map {
                 it.toComTableRowDTO()
@@ -68,47 +68,47 @@ object ComsController {
         }
     }
 
-    suspend fun selectPublishedByAuthorId(authorId: UUID): List<ComTableRowDTO> {
+    suspend fun selectPublishedComsByAuthorId(authorId: UUID): List<ComTableRowDTO> {
         return dbQuery {
-            selectComStatusId(COM_STATUS_PUBLISHED)?.let { statusId ->
+            selectComStatusId(PUBLISHED_STATUS_COM)?.let { statusId ->
                 ComsTable.select { (ComsTable.authorId eq authorId) and (ComsTable.statusId eq statusId) }
             }?.map { it.toComTableRowDTO() } ?: listOf()
         }
     }
 
-    suspend fun setStatusPublished(id: UUID) {
-        setStatus(id, COM_STATUS_PUBLISHED)
+    suspend fun setStatusPublished(comId: UUID) {
+        setStatus(comId, PUBLISHED_STATUS_COM)
     }
 
-    suspend fun setStatusCheckable(id: UUID) {
-        setStatus(id, COM_STATUS_CHECKABLE)
+    suspend fun setStatusCheckable(comId: UUID) {
+        setStatus(comId, CHECKABLE_STATUS_COM)
     }
 
-    private suspend fun setStatus(id: UUID, status: String) {
+    private suspend fun setStatus(comId: UUID, status: String) {
         return dbQuery {
             selectComStatusId(status)?.let { statusId ->
-                ComsTable.update({ ComsTable.id eq id }) {
+                ComsTable.update({ ComsTable.id eq comId }) {
                     it[this.statusId] = statusId
                 }
             }
         }
     }
 
-    suspend fun deleteById(id: UUID) {
+    suspend fun deleteComById(comId: UUID) {
         return dbQuery {
-            ComsTable.deleteWhere { this.id eq id }
+            ComsTable.deleteWhere { this.id eq comId }
         }
     }
 
-    suspend fun selectAllCreated(offsetId: String?): List<ComTableRowDTO> { //TODO pagination
-        return selectAllByStatus(COM_STATUS_CREATED)
+    suspend fun selectAllComsCreated(offsetId: String?): List<ComTableRowDTO> { //TODO pagination
+        return selectAllComsByStatus(CREATED_STATUS_COM)
     }
 
-    suspend fun selectAllPublished(offsetId: String?): List<ComTableRowDTO> { //TODO pagination
-        return selectAllByStatus(COM_STATUS_PUBLISHED)
+    suspend fun selectAllComsPublished(offsetId: String?): List<ComTableRowDTO> { //TODO pagination
+        return selectAllComsByStatus(PUBLISHED_STATUS_COM)
     }
 
-    private suspend fun selectAllByStatus(status: String): List<ComTableRowDTO> {
+    private suspend fun selectAllComsByStatus(status: String): List<ComTableRowDTO> {
         return dbQuery {
             selectComStatusId(status)?.let { statusId ->
                 ComsTable.select { ComsTable.statusId eq statusId }.limit(COMS_LIMIT).map { it.toComTableRowDTO() }

@@ -17,8 +17,8 @@ object LikesService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
             authHeaderHandle(call, token, userId) {
-                val likeId = LikesController.insert(userId!!, comId)
-                val likeDTO = LikesController.selectById(likeId)
+                val likeId = LikesController.insertLike(userId!!, comId)
+                val likeDTO = LikesController.selectLikeById(likeId)
 
                 val response = likeDTO?.toLikeResponse()
                 if (response != null) {
@@ -36,10 +36,10 @@ object LikesService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
             authHeaderHandle(call, token, userId) {
-                val likeDTO = LikesController.selectByUserIdAndComId(userId!!, comId)
+                val likeDTO = LikesController.selectLikeByUserIdAndComId(userId!!, comId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Like not found")
 
-                LikesController.deleteById(likeDTO.id)
+                LikesController.deleteLikeById(likeDTO.id)
                 call.respond(HttpStatusCode.OK)
             }
         }

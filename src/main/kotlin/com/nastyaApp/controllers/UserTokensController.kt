@@ -14,7 +14,7 @@ object UserTokensController {
         val userId: Column<EntityID<UUID>> = reference("user_id", UsersTable.id, ReferenceOption.CASCADE)
     }
 
-    suspend fun insert(userId: UUID): UUID {
+    suspend fun insertUserToken(userId: UUID): UUID {
         return dbQuery {
             UserTokensTable.insertAndGetId {
                 it[this.userId] = userId
@@ -22,13 +22,13 @@ object UserTokensController {
         }
     }
 
-    suspend fun select(token: UUID): UserTokenTableRowModel? {
+    suspend fun selectUserToken(token: UUID): UserTokenTableRowModel? {
         return dbQuery {
             UserTokensTable.select { UserTokensTable.id eq token }.singleOrNull()?.toTokenTableRowModel()
         }
     }
 
-    suspend fun delete(token: UUID) {
+    suspend fun deleteUserToken(token: UUID) {
         dbQuery {
             UserTokensTable.deleteWhere { this.id eq token }
         }

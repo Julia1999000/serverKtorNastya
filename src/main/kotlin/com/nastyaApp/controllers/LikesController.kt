@@ -16,7 +16,7 @@ object LikesController {
         val userId: Column<EntityID<UUID>> = reference("user_id", UsersTable.id, ReferenceOption.CASCADE)
     }
 
-    suspend fun insert(userId: UUID, comId: UUID): UUID {
+    suspend fun insertLike(userId: UUID, comId: UUID): UUID {
         return dbQuery {
             LikersToComsTable.insertAndGetId {
                 it[this.comId] = comId
@@ -25,34 +25,34 @@ object LikesController {
         }
     }
 
-    suspend fun selectById(id: UUID): LikeTableRowDTO? {
+    suspend fun selectLikeById(likeId: UUID): LikeTableRowDTO? {
         return dbQuery {
-            LikersToComsTable.select { LikersToComsTable.id eq id }.singleOrNull()?.toLikeTableRowDTO()
+            LikersToComsTable.select { LikersToComsTable.id eq likeId }.singleOrNull()?.toLikeTableRowDTO()
         }
     }
 
-    suspend fun selectByUserIdAndComId(userId: UUID, comId: UUID): LikeTableRowDTO? {
+    suspend fun selectLikeByUserIdAndComId(userId: UUID, comId: UUID): LikeTableRowDTO? {
         return dbQuery {
             LikersToComsTable.select { (LikersToComsTable.comId eq comId) and (LikersToComsTable.userId eq userId) }
                 .singleOrNull()?.toLikeTableRowDTO()
         }
     }
 
-    suspend fun deleteById(id: UUID) {
+    suspend fun deleteLikeById(likeId: UUID) {
         return dbQuery {
-            LikersToComsTable.deleteWhere { this.id eq id }
+            LikersToComsTable.deleteWhere { this.id eq likeId }
         }
     }
 
-    suspend fun selectCountAllByComId(id: UUID): Int {
+    suspend fun selectCountAllLikesByComId(comId: UUID): Int {
         return dbQuery {
-            LikersToComsTable.select { LikersToComsTable.comId eq id }.count().toInt()
+            LikersToComsTable.select { LikersToComsTable.comId eq comId }.count().toInt()
         }
     }
 
-    suspend fun selectAllByComId(id: UUID): List<LikeTableRowDTO> {
+    suspend fun selectAllLikesByComId(comId: UUID): List<LikeTableRowDTO> {
         return dbQuery {
-            LikersToComsTable.select { LikersToComsTable.comId eq id }.map { it.toLikeTableRowDTO() }
+            LikersToComsTable.select { LikersToComsTable.comId eq comId }.map { it.toLikeTableRowDTO() }
         }
     }
 

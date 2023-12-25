@@ -29,13 +29,13 @@ fun UserTableRowDTO.toShortUserResponse(): ShortUserResponse {
     )
 }
 
-fun UserTableRowDTO.toFullUserResponse(listComs: List<ShortComResponse>, listBoards: List<Board>): FullUserResponse {
+fun UserTableRowDTO.toFullUserResponse(listComs: List<ShortComResponse>, listBoards: List<BoardResponse>): FullUserResponse {
     return FullUserResponse(
         id = this.id,
         name = this.name,
         avatarUrl = generateImagUrl(this.avatarId),
-        coms = listComs,
-        boards = listBoards
+        publishComs = listComs,
+        publicBoards = listBoards
     )
 }
 

@@ -83,17 +83,29 @@ created_date timestamp NOT NULL
 );
 
 
-CREATE TABLE boards(
-id UUID PRIMARY KEY NOT NULL,
-name text NOT NULL,
-owner_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
-);
-
-
 CREATE TABLE likers_to_coms(
 id UUID PRIMARY KEY NOT NULL,
 com_id UUID REFERENCES coms (id) ON DELETE CASCADE NOT NULL,
 user_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL
+);
+
+
+CREATE TABLE board_statuses(
+id character varying(10) PRIMARY KEY NOT NULL
+);
+
+
+INSERT INTO board_statuses
+VALUES
+('PUBLIC'),
+('PRIVATE');
+
+
+CREATE TABLE boards(
+id UUID PRIMARY KEY NOT NULL,
+name text NOT NULL,
+owner_id UUID REFERENCES users (id) ON DELETE CASCADE NOT NULL,
+status_id character varying(10) REFERENCES board_statuses (id) ON DELETE RESTRICT NOT NULL
 );
 
 

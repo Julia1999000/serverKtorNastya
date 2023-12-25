@@ -20,7 +20,7 @@ object UsersController {
 
     private const val USERS_LIMIT = 20 // TODO for pagination
 
-    suspend fun insert(user: AnonymDTO): UUID {
+    suspend fun insertUser(user: AnonymDTO): UUID {
         return dbQuery {
             UsersTable.insertAndGetId {
                 it[this.name] = user.name
@@ -30,21 +30,21 @@ object UsersController {
         }
     }
 
-    suspend fun selectByLogin(login: String): UserTableRowDTO? {
+    suspend fun selectUserByLogin(login: String): UserTableRowDTO? {
         return dbQuery {
             UsersTable.select { UsersTable.login eq login }.singleOrNull()?.toUserTableRowDTO()
         }
     }
 
-    suspend fun selectById(id: UUID): UserTableRowDTO? {
+    suspend fun selectUserById(userId: UUID): UserTableRowDTO? {
         return dbQuery {
-            UsersTable.select { UsersTable.id eq id }.singleOrNull()?.toUserTableRowDTO()
+            UsersTable.select { UsersTable.id eq userId }.singleOrNull()?.toUserTableRowDTO()
         }
     }
 
-    suspend fun updateById(id: UUID, newUser: NewUserDTO) {
+    suspend fun updateUserById(userId: UUID, newUser: NewUserDTO) {
         dbQuery {
-            UsersTable.update({ UsersTable.id eq id }) {
+            UsersTable.update({ UsersTable.id eq userId }) {
                 newUser.name?.let { newName -> it[this.name] = newName }
                 newUser.login?.let { newLogin -> it[this.login] = newLogin }
                 newUser.password?.let { newPassword -> it[this.password] = newPassword }
@@ -54,15 +54,15 @@ object UsersController {
     }
 
     //TODO pagination
-    suspend fun selectAll(offsetId: String?): List<UserTableRowDTO> {
+    suspend fun selectAllUsers(offsetId: String?): List<UserTableRowDTO> {
         return dbQuery {
             UsersTable.selectAll().limit(USERS_LIMIT).map { it.toUserTableRowDTO() }
         }
     }
 
-    suspend fun deleteById(id: UUID) {
+    suspend fun deleteUserById(userId: UUID) {
         dbQuery {
-            UsersTable.deleteWhere { this.id eq id }
+            UsersTable.deleteWhere { this.id eq userId }
         }
     }
 

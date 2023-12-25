@@ -19,7 +19,7 @@ suspend fun authHeaderHandle(call: ApplicationCall, token: UUID?, userId: UUID?,
 }
 
 private suspend fun isValidUserToken(token: UUID, userId: UUID): Boolean {
-    val tokenRow = UserTokensController.select(token)
+    val tokenRow = UserTokensController.selectUserToken(token)
     return tokenRow != null && tokenRow.userId == userId
 }
 
@@ -35,7 +35,7 @@ suspend fun adminHeaderHandle(call: ApplicationCall, token: UUID?, adminId: UUID
 }
 
 private suspend fun isValidAdminToken(token: UUID, adminId: UUID): Boolean {
-    val tokenRow = AdminTokensController.select(token)
+    val tokenRow = AdminTokensController.selectAdminToken(token)
     return tokenRow != null && tokenRow.adminId == adminId
 }
 
@@ -61,6 +61,11 @@ fun getFileIdFromRequest(call: ApplicationCall): UUID? {
 
 fun getCommentIdFromRequest(call: ApplicationCall): UUID? {
     val idStr = call.parameters["comment_id"]
+    return idStr?.let { UUID.fromString(it) }
+}
+
+fun getBoardIdFromRequest(call: ApplicationCall): UUID? {
+    val idStr = call.parameters["board_id"]
     return idStr?.let { UUID.fromString(it) }
 }
 

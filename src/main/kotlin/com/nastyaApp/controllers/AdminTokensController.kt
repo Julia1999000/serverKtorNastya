@@ -14,21 +14,21 @@ object AdminTokensController {
         val adminId: Column<EntityID<UUID>> = reference("admin_id", AdminsTable.id, ReferenceOption.CASCADE)
     }
 
-    suspend fun insert(userId: UUID): UUID {
+    suspend fun insertAdminToken(adminId: UUID): UUID {
         return dbQuery {
             AdminTokensTable.insertAndGetId {
-                it[this.adminId] = userId
+                it[this.adminId] = adminId
             }.value
         }
     }
 
-    suspend fun select(token: UUID): AdminTokenTableRowModel? {
+    suspend fun selectAdminToken(token: UUID): AdminTokenTableRowModel? {
         return dbQuery {
             AdminTokensTable.select { AdminTokensTable.id eq token }.singleOrNull()?.toTokenTableRowModel()
         }
     }
 
-    suspend fun delete(token: UUID) {
+    suspend fun deleteAdminToken(token: UUID) {
         dbQuery {
             AdminTokensTable.deleteWhere { this.id eq token }
         }

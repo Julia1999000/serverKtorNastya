@@ -54,8 +54,8 @@ data class FullUserResponse(
     @Serializable(with = UUIDSerializer::class) val id: UUID,
     val name: String,
     val avatarUrl: String? = null,
-    val coms: List<ShortComResponse>,
-    val boards: List<Board>
+    val publishComs: List<ShortComResponse>,
+    val publicBoards: List<BoardResponse>
 )
 
 //----------- DTO -----------

@@ -20,8 +20,8 @@ object AdminsService {
             val anonymDTO = request.toAnonymDTO()
 
             val adminId = AdminsController.insert(anonymDTO)
-            val adminDTO = AdminsController.selectById(adminId)
-            val token = AdminTokensController.insert(adminId)
+            val adminDTO = AdminsController.selectAdminById(adminId)
+            val token = AdminTokensController.insertAdminToken(adminId)
 
             adminDTO?.toIdentityAdminResponse(token)?.let { response ->
                 call.respond(HttpStatusCode.Created, response)
@@ -32,14 +32,14 @@ object AdminsService {
     suspend fun loginAdmin(call: ApplicationCall) {
         apiCatch(call) {
             val request = call.receive<LoginRequest>()
-            val adminDTO = AdminsController.selectByLogin(request.login)
+            val adminDTO = AdminsController.selectAdminByLogin(request.login)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Login not found")
 
             if (request.password != adminDTO.password) {
                 return@apiCatch call.respond(HttpStatusCode.OK, "Invalid password")
             }
 
-            val token = AdminTokensController.insert(adminDTO.id)
+            val token = AdminTokensController.insertAdminToken(adminDTO.id)
             val response = adminDTO.toIdentityAdminResponse(token)
             call.respond(HttpStatusCode.OK, response)
         }
@@ -47,17 +47,17 @@ object AdminsService {
 
     suspend fun getAllAdmins(call: ApplicationCall) {
         apiCatch(call) {
-            val response = AdminsController.selectAll().map { it.toAdminInfoResponse() }
+            val response = AdminsController.selectAllAdmins().map { it.toAdminInfoResponse() }
             call.respond(HttpStatusCode.OK, response)
         }
     }
 
     suspend fun getAdminById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Admin id not found")
 
-            val adminDTO = AdminsController.selectById(id)
+            val adminDTO = AdminsController.selectAdminById(adminId)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Admin not found")
 
             val response = adminDTO.toAdminInfoResponse()
@@ -67,15 +67,15 @@ object AdminsService {
 
     suspend fun updateAminInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, id) {
+            adminHeaderHandle(call, token, adminId) {
                 val request = call.receive<UpdateAdminInfoRequest>()
                 val newAdminDTO = request.toNewAdminDTO()
 
-                AdminsController.updateById(id!!, newAdminDTO)
-                AdminsController.selectById(id)?.toAdminInfoResponse()?.let {
+                AdminsController.updateAdminById(adminId!!, newAdminDTO)
+                AdminsController.selectAdminById(adminId)?.toAdminInfoResponse()?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
             }
@@ -84,14 +84,14 @@ object AdminsService {
 
     suspend fun updateAdminSecretInfoById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, id) {
+            adminHeaderHandle(call, token, adminId) {
                 val request = call.receive<UpdateSecretInfoRequest>()
                 val newAdminDTO = request.toNewAdminDTO()
 
-                AdminsController.updateById(id!!, newAdminDTO)
+                AdminsController.updateAdminById(adminId!!, newAdminDTO)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -99,11 +99,11 @@ object AdminsService {
 
     suspend fun delAdminById(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, id) {
-                AdminsController.deleteById(id!!)
+            adminHeaderHandle(call, token, adminId) {
+                AdminsController.deleteAdminById(adminId!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -111,11 +111,11 @@ object AdminsService {
 
     suspend fun unloginAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, id) {
-                AdminTokensController.delete(token!!)
+            adminHeaderHandle(call, token, adminId) {
+                AdminTokensController.deleteAdminToken(token!!)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -123,11 +123,11 @@ object AdminsService {
 
     suspend fun delAvatar(call: ApplicationCall) {
         apiCatch(call) {
-            val id = getAdminIdFromRequest(call)
+            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, id) {
-                val adminRow = AdminsController.selectById(id!!)
+            adminHeaderHandle(call, token, adminId) {
+                val adminRow = AdminsController.selectAdminById(adminId!!)
 
                 adminRow?.avatarId?.let { avatarId ->
                     FilesController.deleteImageById(avatarId)

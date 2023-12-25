@@ -171,12 +171,48 @@ GET  http://127.0.0.1:8080/coms/getAllCreated/{admin_id}
     headers:
         Bearer-Administration: "token"
 
-
 * */
 
 /* BOARDS
 
-    //TODO
+POST  http://127.0.0.1:8080/boards/create/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+    body (raw):
+        {
+            "name": "",
+            "status": ""
+        }
+
+
+DELETE  http://127.0.0.1:8080/boards/delete/{user_id}/{board_id}
+    headers:
+        Bearer-Authorization: "token"
+
+
+PUT  http://127.0.0.1:8080/boards/update/{user_id}/{board_id}
+    headers:
+        Bearer-Authorization: "token"
+    body (raw):
+        {
+            "name": "", *
+            "status": "" *
+        }
+
+
+POST  http://127.0.0.1:8080/boards/addCom/{user_id}
+    headers:
+        Bearer-Authorization: "token"
+    body (raw):
+        {
+            "comId": "",
+            "boardId": ""
+        }
+
+
+DELETE  http://127.0.0.1:8080/boards/removeCom/{user_id}/{board_id}/{com_id}
+    headers:
+        Bearer-Authorization: "token"
 
 * */
 

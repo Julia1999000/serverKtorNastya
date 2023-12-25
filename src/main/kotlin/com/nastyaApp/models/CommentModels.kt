@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 @Serializable
-data class CommentRequest(
+data class CreateCommentRequest(
     @Serializable(with = UUIDSerializer::class) val authorId: UUID,
     @Serializable(with = UUIDSerializer::class) val comId: UUID,
     val text: String,
