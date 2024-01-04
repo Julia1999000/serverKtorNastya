@@ -7,23 +7,23 @@ import io.ktor.server.routing.*
 fun Route.configureBoardsRouting() {
     route("boards") {
 
-        post("/create/{user_id}") {
+        post("/create") {
             BoardsService.createBoard(call)
         }
 
-        delete("/delete/{user_id}/{board_id}") {
+        delete("/delete/{board_id}") {
             BoardsService.deleteBoard(call)
         }
 
-        put("/update/{user_id}/{board_id}") {
+        put("/update/{board_id}") {
             BoardsService.updateBoard(call)
         }
 
-        post("/addCom/{user_id}") {
+        post("/addCom") {
             BoardsService.addComToBoard(call)
         }
 
-        delete("/removeCom/{user_id}/{board_id}/{com_id}") {
+        delete("/removeCom/{board_id}/{com_id}") {
             BoardsService.deleteComFromBoard(call)
         }
 
@@ -31,7 +31,7 @@ fun Route.configureBoardsRouting() {
             BoardsService.getAllComsByBoadr(call)
         }
 
-        get("/getAllBoardsByUser/{user_id}") {
+        get("/getAllBoardsByUser") {
             BoardsService.getAllBoardsBuUser(call)
         }
 

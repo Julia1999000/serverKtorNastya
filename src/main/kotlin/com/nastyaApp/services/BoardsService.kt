@@ -1,9 +1,6 @@
 package com.nastyaApp.services
 
-import com.nastyaApp.controllers.BoardController
-import com.nastyaApp.controllers.CommentController
-import com.nastyaApp.controllers.ComsController
-import com.nastyaApp.controllers.LikesController
+import com.nastyaApp.controllers.*
 import com.nastyaApp.mappers.*
 import com.nastyaApp.models.ComToBoardRequest
 import com.nastyaApp.models.CreateBoardRequest
@@ -18,16 +15,18 @@ object BoardsService {
 
     suspend fun createBoard(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
                 val request = call.receive<CreateBoardRequest>()
+
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
 
                 BoardController.selectBoardStatusId(request.status.uppercase())
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Board status not found")
 
-                val newBoardDTO = request.toNewBoardDTO(userId!!)
+                val newBoardDTO = request.toNewBoardDTO(userId)
                 val boardId = BoardController.insertBoard(newBoardDTO)
                 val boardDTO = boardId?.let { BoardController.selectBoardById(it) }
 
@@ -41,12 +40,14 @@ object BoardsService {
 
     suspend fun deleteBoard(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val boardId = getBoardIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Board id not found")
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val boardDTO = BoardController.selectBoardById(boardId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Board not found")
 
@@ -62,12 +63,14 @@ object BoardsService {
 
     suspend fun updateBoard(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val boardId = getBoardIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Board id not found")
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val boardDTO = BoardController.selectBoardById(boardId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Board not found")
 
@@ -93,11 +96,13 @@ object BoardsService {
 
     suspend fun addComToBoard(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
                 val request = call.receive<ComToBoardRequest>()
+
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
 
                 val boardDTO = BoardController.selectBoardById(request.boardId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Board not found")
@@ -116,14 +121,16 @@ object BoardsService {
 
     suspend fun deleteComFromBoard(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val boardId = getBoardIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Board id not found")
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val boardDTO = BoardController.selectBoardById(boardId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Board not found")
 
@@ -154,11 +161,13 @@ object BoardsService {
 
     suspend fun getAllBoardsBuUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
-                val response = BoardController.selectAllBoardsByUserId(userId!!)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
+                val response = BoardController.selectAllBoardsByUserId(userId)
                 call.respond(HttpStatusCode.OK, response)
             }
         }

@@ -65,16 +65,18 @@ object AdminsService {
         }
     }
 
-    suspend fun updateAminInfoById(call: ApplicationCall) {
+    suspend fun updateAminInfo(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
+                val adminId = AdminTokensController.selectAdminToken(token!!)?.adminId
+                    ?: return@adminHeaderHandle call.respond(HttpStatusCode.BadRequest, "Admin not found")
+
                 val request = call.receive<UpdateAdminInfoRequest>()
                 val newAdminDTO = request.toNewAdminDTO()
 
-                AdminsController.updateAdminById(adminId!!, newAdminDTO)
+                AdminsController.updateAdminById(adminId, newAdminDTO)
                 AdminsController.selectAdminById(adminId)?.toAdminInfoResponse()?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
@@ -82,28 +84,32 @@ object AdminsService {
         }
     }
 
-    suspend fun updateAdminSecretInfoById(call: ApplicationCall) {
+    suspend fun updateAdminSecretInfo(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
+                val adminId = AdminTokensController.selectAdminToken(token!!)?.adminId
+                    ?: return@adminHeaderHandle call.respond(HttpStatusCode.BadRequest, "Admin not found")
+
                 val request = call.receive<UpdateSecretInfoRequest>()
                 val newAdminDTO = request.toNewAdminDTO()
 
-                AdminsController.updateAdminById(adminId!!, newAdminDTO)
+                AdminsController.updateAdminById(adminId, newAdminDTO)
                 call.respond(HttpStatusCode.OK)
             }
         }
     }
 
-    suspend fun delAdminById(call: ApplicationCall) {
+    suspend fun delAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
-                AdminsController.deleteAdminById(adminId!!)
+            adminHeaderHandle(call, token) {
+                val adminId = AdminTokensController.selectAdminToken(token!!)?.adminId
+                    ?: return@adminHeaderHandle call.respond(HttpStatusCode.BadRequest, "Admin not found")
+
+                AdminsController.deleteAdminById(adminId)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -111,10 +117,9 @@ object AdminsService {
 
     suspend fun unloginAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 AdminTokensController.deleteAdminToken(token!!)
                 call.respond(HttpStatusCode.OK)
             }
@@ -123,11 +128,13 @@ object AdminsService {
 
     suspend fun delAvatar(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
-                val adminRow = AdminsController.selectAdminById(adminId!!)
+            adminHeaderHandle(call, token) {
+                val adminId = AdminTokensController.selectAdminToken(token!!)?.adminId
+                    ?: return@adminHeaderHandle call.respond(HttpStatusCode.BadRequest, "Admin not found")
+
+                val adminRow = AdminsController.selectAdminById(adminId)
 
                 adminRow?.avatarId?.let { avatarId ->
                     FilesController.deleteImageById(avatarId)

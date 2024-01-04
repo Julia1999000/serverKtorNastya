@@ -1,6 +1,7 @@
 package com.nastyaApp.services
 
 import com.nastyaApp.controllers.LikesController
+import com.nastyaApp.controllers.UserTokensController
 import com.nastyaApp.controllers.UsersController
 import com.nastyaApp.mappers.toLikeResponse
 import com.nastyaApp.mappers.toShortUserResponse
@@ -13,13 +14,15 @@ object LikesService {
 
     suspend fun setLike(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            authHeaderHandle(call, token, userId) {
-                val likeId = LikesController.insertLike(userId!!, comId)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
+                val likeId = LikesController.insertLike(userId, comId)
                 val likeDTO = LikesController.selectLikeById(likeId)
 
                 val response = likeDTO?.toLikeResponse()
@@ -32,13 +35,15 @@ object LikesService {
 
     suspend fun deleteLike(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            authHeaderHandle(call, token, userId) {
-                val likeDTO = LikesController.selectLikeByUserIdAndComId(userId!!, comId)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
+                val likeDTO = LikesController.selectLikeByUserIdAndComId(userId, comId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Like not found")
 
                 LikesController.deleteLikeById(likeDTO.id)

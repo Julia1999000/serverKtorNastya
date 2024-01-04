@@ -7,36 +7,30 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import java.util.*
 
-suspend fun authHeaderHandle(call: ApplicationCall, token: UUID?, userId: UUID?, runValidBlock: suspend () -> Unit) {
-    token ?: return call.respond(HttpStatusCode.BadRequest, "Token not found")
-    userId ?: return call.respond(HttpStatusCode.BadRequest, "User id not found")
-
-    if (isValidUserToken(token, userId)) {
+suspend fun authHeaderHandle(call: ApplicationCall, token: UUID?, runValidBlock: suspend () -> Unit) {
+    if (isValidUserToken(token)) {
         runValidBlock()
     } else {
-        call.respond(HttpStatusCode.BadRequest, "Invalid token")
+        call.respond(HttpStatusCode.BadRequest, "Invalid token or not found")
     }
 }
 
-private suspend fun isValidUserToken(token: UUID, userId: UUID): Boolean {
-    val tokenRow = UserTokensController.selectUserToken(token)
-    return tokenRow != null && tokenRow.userId == userId
+private suspend fun isValidUserToken(token: UUID?): Boolean {
+    val tokenRow = token?.let { UserTokensController.selectUserToken(it) }
+    return tokenRow != null
 }
 
-suspend fun adminHeaderHandle(call: ApplicationCall, token: UUID?, adminId: UUID?, runValidBlock: suspend () -> Unit) {
-    token ?: return call.respond(HttpStatusCode.BadRequest, "Token not found")
-    adminId ?: return call.respond(HttpStatusCode.BadRequest, "Admin id not found")
-
-    if (isValidAdminToken(token, adminId)) {
+suspend fun adminHeaderHandle(call: ApplicationCall, token: UUID?, runValidBlock: suspend () -> Unit) {
+    if (isValidAdminToken(token)) {
         runValidBlock()
     } else {
-        call.respond(HttpStatusCode.BadRequest, "Invalid token")
+        call.respond(HttpStatusCode.BadRequest, "Invalid token or not found")
     }
 }
 
-private suspend fun isValidAdminToken(token: UUID, adminId: UUID): Boolean {
-    val tokenRow = AdminTokensController.selectAdminToken(token)
-    return tokenRow != null && tokenRow.adminId == adminId
+private suspend fun isValidAdminToken(token: UUID?): Boolean {
+    val tokenRow = token?.let { AdminTokensController.selectAdminToken(it) }
+    return tokenRow != null
 }
 
 fun getUserIdFromRequest(call: ApplicationCall): UUID? {

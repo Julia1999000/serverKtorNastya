@@ -19,27 +19,27 @@ fun Route.configureUsersRouting() {
             UsersService.getFullUserById(call)
         }
 
-        put("/updateInfo/{user_id}") {
-            UsersService.updateUserInfoById(call)
+        put("/updateInfo") {
+            UsersService.updateUserInfo(call)
         }
 
-        put("/updateSecretInfo/{user_id}") {
-            UsersService.updateUserSecretInfoById(call)
+        put("/updateSecretInfo") {
+            UsersService.updateUserSecretInfo(call)
         }
 
-        delete("/del/{user_id}") {
-            UsersService.delUserById(call)
+        delete("/delete") {
+            UsersService.delUser(call)
         }
 
         get("/getAll") {
             UsersService.getAllUsers(call)
         }
 
-        delete("/unlogin/{user_id}") {
+        delete("/unlogin") {
             UsersService.unloginUser(call)
         }
 
-        delete("/delAvatar/{user_id}") {
+        delete("/delAvatar") {
             UsersService.delAvatar(call)
         }
     }

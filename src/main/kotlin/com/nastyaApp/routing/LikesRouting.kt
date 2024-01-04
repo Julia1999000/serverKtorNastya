@@ -7,11 +7,11 @@ import io.ktor.server.routing.*
 fun Route.configureLikesRouting() {
     route("likes") {
 
-        post("/set/{user_id}/{com_id}") {
+        post("/set/{com_id}") {
             LikesService.setLike(call)
         }
 
-        delete("/remove/{user_id}/{com_id}") {
+        delete("/remove/{com_id}") {
             LikesService.deleteLike(call)
         }
 

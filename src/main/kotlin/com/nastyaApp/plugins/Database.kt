@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureDatabases() {
-    val database = Database.connect(
+    Database.connect(
         url = System.getenv("DB_URL"),
         driver = "org.postgresql.Driver",
         user = System.getenv("DB_USER"),

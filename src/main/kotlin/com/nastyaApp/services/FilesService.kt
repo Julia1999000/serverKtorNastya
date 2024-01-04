@@ -14,8 +14,7 @@ object FilesService {
     suspend fun uploadFileByUser(call: ApplicationCall) {
         apiCatch(call) {
             val token = getUserTokenFromHeaders(call)
-            val userId = getUserIdFromRequest(call)
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
                 uploadFile(call)
             }
         }
@@ -24,8 +23,7 @@ object FilesService {
     suspend fun uploadFileByAdmin(call: ApplicationCall) {
         apiCatch(call) {
             val token = getAdminTokenFromHeaders(call)
-            val adminId = getAdminIdFromRequest(call)
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 uploadFile(call)
             }
         }

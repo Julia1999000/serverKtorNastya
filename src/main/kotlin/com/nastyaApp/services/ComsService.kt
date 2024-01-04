@@ -1,9 +1,6 @@
 package com.nastyaApp.services
 
-import com.nastyaApp.controllers.CommentController
-import com.nastyaApp.controllers.ComsController
-import com.nastyaApp.controllers.LikesController
-import com.nastyaApp.controllers.UsersController
+import com.nastyaApp.controllers.*
 import com.nastyaApp.mappers.*
 import com.nastyaApp.models.*
 import com.nastyaApp.utils.*
@@ -15,12 +12,14 @@ import io.ktor.server.response.*
 object ComsService {
     suspend fun createComByUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val request = call.receive<ComRequest>()
-                val newComDTO = request.toNewComDTO(userId!!)
+                val newComDTO = request.toNewComDTO(userId)
 
                 val comId = ComsController.insertCom(newComDTO)
                 val comDTO = comId?.let { ComsController.selectComById(it) }
@@ -33,13 +32,15 @@ object ComsService {
         }
     }
 
-    suspend fun getAllComs(call: ApplicationCall) {
+    suspend fun getAllUserComs(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
-                val response = ComsController.selectAllComsByAuthorId(userId!!).map { com ->
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
+                val response = ComsController.selectAllComsByAuthorId(userId).map { com ->
                     val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                     val countComments = CommentController.selectCountAllCommentsByComId(com.id)
                     com.toShortComResponse(countLikers, countComments)
@@ -49,7 +50,7 @@ object ComsService {
         }
     }
 
-    suspend fun getPublishedComs(call: ApplicationCall) {
+    suspend fun getPublishedComsByUser(call: ApplicationCall) {
         apiCatch(call) {
             val userId = getUserIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "User id not found")
@@ -88,12 +89,11 @@ object ComsService {
 
     suspend fun publishComByAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 ComsController.setStatusPublished(comId)
                 call.respond(HttpStatusCode.OK)
             }
@@ -102,12 +102,11 @@ object ComsService {
 
     suspend fun checkComByAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 ComsController.setStatusCheckable(comId)
                 call.respond(HttpStatusCode.OK)
             }
@@ -116,12 +115,11 @@ object ComsService {
 
     suspend fun deleteComByAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 ComsController.deleteComById(comId)
                 call.respond(HttpStatusCode.OK)
             }
@@ -130,12 +128,14 @@ object ComsService {
 
     suspend fun deleteComByUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
             val comId = getComIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val comDTO = ComsController.selectComById(comId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Com not found")
 
@@ -161,12 +161,11 @@ object ComsService {
         }
     }
 
-    suspend fun getAllCreatedComs(call: ApplicationCall) {
+    suspend fun getAllCreatedComsByAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 // TODO pagination
                 val response = ComsController.selectAllComsCreated("").map { com ->
                     val countLikers = LikesController.selectCountAllLikesByComId(com.id)

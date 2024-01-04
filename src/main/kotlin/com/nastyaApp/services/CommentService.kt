@@ -2,6 +2,7 @@ package com.nastyaApp.services
 
 import com.nastyaApp.controllers.CommentController
 import com.nastyaApp.controllers.ComsController
+import com.nastyaApp.controllers.UserTokensController
 import com.nastyaApp.controllers.UsersController
 import com.nastyaApp.mappers.toCommentResponse
 import com.nastyaApp.mappers.toNewCommentDTO
@@ -16,17 +17,19 @@ object CommentService {
 
     suspend fun createComment(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val request = call.receive<CreateCommentRequest>()
                 val newCommentDTO = request.toNewCommentDTO()
 
                 val newCommentId = CommentController.insertComment(newCommentDTO)
                 val commentDTO = CommentController.selectCommentById(newCommentId)
 
-                val userDTO = UsersController.selectUserById(userId!!)
+                val userDTO = UsersController.selectUserById(userId)
                 val response = userDTO?.let { commentDTO?.toCommentResponse(it.avatarId, it.name) }
                 if (response != null) {
                     call.respond(HttpStatusCode.Created, response)
@@ -37,12 +40,14 @@ object CommentService {
 
     suspend fun deleteCommentByUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
             val commentId = getCommentIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Comment id not found")
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val commentDTO = CommentController.selectCommentById(commentId)
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "Comment not found")
 
@@ -61,12 +66,11 @@ object CommentService {
 
     suspend fun deleteCommentByAdmin(call: ApplicationCall) {
         apiCatch(call) {
-            val adminId = getAdminIdFromRequest(call)
             val token = getAdminTokenFromHeaders(call)
             val commentId = getCommentIdFromRequest(call)
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Comment id not found")
 
-            adminHeaderHandle(call, token, adminId) {
+            adminHeaderHandle(call, token) {
                 CommentController.deleteCommentById(commentId)
                 call.respond(HttpStatusCode.OK)
             }

@@ -71,16 +71,17 @@ object UsersService {
         }
     }
 
-    suspend fun updateUserInfoById(call: ApplicationCall) {
+    suspend fun updateUserInfo(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
 
-            authHeaderHandle(call, token, userId) {
                 val request = call.receive<UpdateUserInfoRequest>()
                 val newUserDTO = request.toNewUserDTO()
 
-                UsersController.updateUserById(userId!!, newUserDTO)
+                UsersController.updateUserById(userId, newUserDTO)
                 UsersController.selectUserById(userId)?.toShortUserResponse()?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
@@ -88,28 +89,32 @@ object UsersService {
         }
     }
 
-    suspend fun updateUserSecretInfoById(call: ApplicationCall) {
+    suspend fun updateUserSecretInfo(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
                 val request = call.receive<UpdateSecretInfoRequest>()
                 val newUserDTO = request.toNewUserDTO()
 
-                UsersController.updateUserById(userId!!, newUserDTO)
+                UsersController.updateUserById(userId, newUserDTO)
                 call.respond(HttpStatusCode.OK)
             }
         }
     }
 
-    suspend fun delUserById(call: ApplicationCall) {
+    suspend fun delUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
-                UsersController.deleteUserById(userId!!)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
+
+                UsersController.deleteUserById(userId)
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -117,10 +122,9 @@ object UsersService {
 
     suspend fun unloginUser(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
+            authHeaderHandle(call, token) {
                 UserTokensController.deleteUserToken(token!!)
                 call.respond(HttpStatusCode.OK)
             }
@@ -129,13 +133,13 @@ object UsersService {
 
     suspend fun delAvatar(call: ApplicationCall) {
         apiCatch(call) {
-            val userId = getUserIdFromRequest(call)
             val token = getUserTokenFromHeaders(call)
 
-            authHeaderHandle(call, token, userId) {
-                val userRow = UsersController.selectUserById(userId!!)
+            authHeaderHandle(call, token) {
+                val userId = UserTokensController.selectUserToken(token!!)?.userId
+                    ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
 
-                userRow?.avatarId?.let { avatarId ->
+                UsersController.selectUserById(userId)?.avatarId?.let { avatarId ->
                     FilesController.deleteImageById(avatarId)
                 }
                 call.respond(HttpStatusCode.OK)
