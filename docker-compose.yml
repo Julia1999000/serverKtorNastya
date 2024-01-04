@@ -26,3 +26,11 @@ services:
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
     restart: always
+  pg_admin:
+    container_name: pgAdmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=noeemail@noemail.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - 5050:80
