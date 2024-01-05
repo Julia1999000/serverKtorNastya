@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gradle-app
+    volumes:
+      - ./:/serverKtorNastya
+    ports:
+      - 8090:8090
+    environment:
+      - DB_URL=jdbc:postgresql://database:5432/db_comfort
+      - DB_USER=masha
+      - DB_PASSWORD=8919210
+    restart: always
+  database:
+    image: postgres
+    environment:
+      - POSTGRES_USER=masha
+      - POSTGRES_PASSWORD=8919210
+      - POSTGRES_DB=db_comfort
+    ports:
+      - 5432:5432
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    restart: always
