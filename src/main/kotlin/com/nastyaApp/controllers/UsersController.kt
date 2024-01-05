@@ -18,6 +18,7 @@ object UsersController {
         val avatarId: Column<EntityID<UUID>?> = reference("avatar_id", ImagesTable.id, ReferenceOption.SET_NULL).nullable()
     }
 
+
     private const val USERS_LIMIT = 20 // TODO for pagination
 
     suspend fun insertUser(user: AnonymDTO): UUID {

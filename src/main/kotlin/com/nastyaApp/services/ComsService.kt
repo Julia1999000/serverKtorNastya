@@ -120,6 +120,9 @@ object ComsService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
             adminHeaderHandle(call, token) {
+                ComsController.selectComById(comId)?.imageId?.let {
+                    FilesController.deleteImageById(it)
+                }
                 ComsController.deleteComById(comId)
                 call.respond(HttpStatusCode.OK)
             }
@@ -143,6 +146,9 @@ object ComsService {
                     return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "No rights")
                 }
 
+                ComsController.selectComById(comId)?.imageId?.let {
+                    FilesController.deleteImageById(it)
+                }
                 ComsController.deleteComById(comId)
                 call.respond(HttpStatusCode.OK)
             }

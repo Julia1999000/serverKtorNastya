@@ -44,7 +44,7 @@ dependencies {
 
     implementation("org.postgresql:postgresql:$postgresqlVersion")
 
-    testImplementation("io.ktor:ktor-server-tests-jvm")
+
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
 }

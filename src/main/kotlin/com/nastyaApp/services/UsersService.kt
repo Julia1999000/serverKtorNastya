@@ -33,7 +33,7 @@ object UsersService {
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Login not found")
 
             if (request.password != userDTO.password) {
-                return@apiCatch call.respond(HttpStatusCode.OK, "Invalid password")
+                return@apiCatch call.respond(HttpStatusCode.BadRequest, "Invalid password")
             }
 
             val token = UserTokensController.insertUserToken(userDTO.id)
@@ -114,7 +114,11 @@ object UsersService {
                 val userId = UserTokensController.selectUserToken(token!!)?.userId
                     ?: return@authHeaderHandle call.respond(HttpStatusCode.BadRequest, "User not found")
 
+                UsersController.selectUserById(userId)?.avatarId?.let { avatarId ->
+                    FilesController.deleteImageById(avatarId)
+                }
                 UsersController.deleteUserById(userId)
+
                 call.respond(HttpStatusCode.OK)
             }
         }
