@@ -16,6 +16,8 @@ object BoardController {
     private const val PUBLIC_STATUS_BOARD = "PUBLIC"
     private const val PRIVATE_STATUS_BOARD = "PRIVATE"
 
+    private val LIST_STATUSES = listOf(PUBLIC_STATUS_BOARD, PRIVATE_STATUS_BOARD)
+
     object BoardStatusesTable : IdTable<String>("board_statuses") {
         override val id: Column<EntityID<String>> = varchar("id", 10).entityId()
         override val primaryKey = PrimaryKey(id)
@@ -41,6 +43,22 @@ object BoardController {
                     it[this.statusId] = statusId
                 }.value
             }
+        }
+    }
+
+    suspend fun insertBoardStatuses() {
+        return dbQuery {
+            LIST_STATUSES.forEach { boardStatus ->
+                BoardStatusesTable.insert {
+                    it[this.id] = boardStatus
+                }
+            }
+        }
+    }
+
+    suspend fun isEmptyBoardStatusesTable(): Boolean {
+        return dbQuery {
+            BoardStatusesTable.selectAll().empty()
         }
     }
 

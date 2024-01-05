@@ -2,6 +2,7 @@ package com.nastyaApp.plugins
 
 import com.nastyaApp.controllers.*
 import io.ktor.server.application.*
+import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.StdOutSqlLogger
@@ -34,5 +35,18 @@ fun Application.configureDatabases() {
             BoardController.BoardsTable,
             BoardController.BoardsToComsTable
         )
+
+        launch {
+            if (FilesController.isEmptyFileTypesTable()) {
+                FilesController.insertFileTypes()
+            }
+            if (ComsController.isEmptyComStatusesTable()) {
+                ComsController.insertComStatuses()
+            }
+            if (BoardController.isEmptyBoardStatusesTable()) {
+                BoardController.insertBoardStatuses()
+            }
+        }
+
     }
 }

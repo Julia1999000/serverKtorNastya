@@ -21,6 +21,8 @@ object ComsController {
     private const val CHECKABLE_STATUS_COM = "CHECKABLE"
     private const val COMS_LIMIT = 20 // TODO for pagination
 
+    private val LIST_STATUSES = listOf(CREATED_STATUS_COM, PUBLISHED_STATUS_COM, CHECKABLE_STATUS_COM)
+
     object ComStatusesTable : IdTable<String>("com_statuses") {
         override val id: Column<EntityID<String>> = varchar("id", 10).entityId()
         override val primaryKey = PrimaryKey(id)
@@ -45,6 +47,22 @@ object ComsController {
                     it[this.statusId] = statusId
                 }.value
             }
+        }
+    }
+
+    suspend fun insertComStatuses() {
+        return dbQuery {
+            LIST_STATUSES.forEach { comStatus ->
+                ComStatusesTable.insert {
+                    it[this.id] = comStatus
+                }
+            }
+        }
+    }
+
+    suspend fun isEmptyComStatusesTable(): Boolean {
+        return dbQuery {
+            ComStatusesTable.selectAll().empty()
         }
     }
 

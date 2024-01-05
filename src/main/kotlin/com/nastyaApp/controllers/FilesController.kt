@@ -10,6 +10,9 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.util.*
 
 object FilesController {
+
+    private val ACCEPTED_IMAGE_TYPES = listOf("PNG", "JPG", "JPEG")
+
     object FileTypesTable : IdTable<String>("file_types") {
         override val id: Column<EntityID<String>> = varchar("id", 6).entityId()
         override val primaryKey = PrimaryKey(id)
@@ -37,6 +40,12 @@ object FilesController {
         }
     }
 
+    suspend fun isEmptyFileTypesTable(): Boolean {
+        return dbQuery {
+            FileTypesTable.selectAll().empty()
+        }
+    }
+
     private suspend fun selectFileTypeId(type: String): EntityID<String>? {
         return dbQuery {
             FileTypesTable.select { FileTypesTable.id eq type }.singleOrNull()?.get(FileTypesTable.id)
@@ -46,6 +55,16 @@ object FilesController {
     suspend fun deleteImageById(imageId: UUID) {
         dbQuery {
             ImagesTable.deleteWhere { this.id eq imageId }
+        }
+    }
+
+    suspend fun insertFileTypes() {
+        return dbQuery {
+            ACCEPTED_IMAGE_TYPES.forEach { fileType ->
+                FileTypesTable.insert {
+                    it[this.id] = fileType
+                }
+            }
         }
     }
 
