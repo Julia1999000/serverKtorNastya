@@ -32,4 +32,7 @@ SERVER_PORT
 ## Запуск машины minikube
 `minikube start`
 
+## Запуск сервиса minikube
+`minikube service gradle-app-service`
+
 ## Документация [API](https://test-my.postman.co/workspaces)
