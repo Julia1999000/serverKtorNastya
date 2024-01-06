@@ -1,5 +1,5 @@
 <div id="header" align="center">
-  <img src="https://github.com/Julia1999000/serverKtorNastya/assets/99553591/5429189c-6009-4bec-85ec-05e0a53654fa" width="500">
+  <img src="https://github.com/Julia1999000/serverKtorNastya/assets/99553591/4c8117f0-24bb-45e7-a8c4-20d9680129e8" width="500">
 </div>
 
 # Проект comFort
