@@ -14,6 +14,8 @@ services:
       - DB_URL=jdbc:postgresql://database:5432/db_comfort
       - DB_USER=masha
       - DB_PASSWORD=8919210
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8090
     restart: always
   database:
     image: postgres
