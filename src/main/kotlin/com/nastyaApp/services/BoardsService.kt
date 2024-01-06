@@ -152,7 +152,13 @@ object BoardsService {
             val response = BoardController.selectAllComByBoard(boardId).mapNotNull {
                 val likersCount = LikesController.selectCountAllLikesByComId(it.comId)
                 val commentsCount = CommentController.selectCountAllCommentsByComId(it.comId)
-                ComsController.selectComById(it.comId)?.toShortComResponse(likersCount, commentsCount)
+                ComsController.selectComById(it.comId)?.let { com ->
+                    com.toShortComResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), com.imageId),
+                        likersCount,
+                        commentsCount
+                    )
+                }
             }
 
             call.respond(HttpStatusCode.OK, response)

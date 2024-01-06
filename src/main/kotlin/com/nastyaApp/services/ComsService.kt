@@ -24,7 +24,8 @@ object ComsService {
                 val comId = ComsController.insertCom(newComDTO)
                 val comDTO = comId?.let { ComsController.selectComById(it) }
 
-                val response = comDTO?.toShortComResponse()
+                val response = comDTO?.toShortComResponse(
+                    generateImagUrl(call.request.host(), call.request.port(), comDTO.imageId))
                 if (response != null) {
                     call.respond(HttpStatusCode.Created, response)
                 }
@@ -43,7 +44,8 @@ object ComsService {
                 val response = ComsController.selectAllComsByAuthorId(userId).map { com ->
                     val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                     val countComments = CommentController.selectCountAllCommentsByComId(com.id)
-                    com.toShortComResponse(countLikers, countComments)
+                    com.toShortComResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), com.imageId), countLikers, countComments)
                 }
                 call.respond(HttpStatusCode.OK, response)
             }
@@ -58,7 +60,8 @@ object ComsService {
             val response = ComsController.selectPublishedComsByAuthorId(userId).map { com ->
                 val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                 val countComments = CommentController.selectCountAllCommentsByComId(com.id)
-                com.toShortComResponse(countLikers, countComments)
+                com.toShortComResponse(
+                    generateImagUrl(call.request.host(), call.request.port(), com.imageId), countLikers, countComments)
             }
             call.respond(HttpStatusCode.OK, response)
         }
@@ -73,16 +76,21 @@ object ComsService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com not found")
 
             val listLikers = LikesController.selectAllLikesByComId(comDTO.id).mapNotNull { like ->
-                UsersController.selectUserById(like.likerId)?.toShortUserResponse()
+                UsersController.selectUserById(like.likerId)?.let {
+                    it.toShortUserResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), it.avatarId))
+                }
             }
 
             val authorDTO = UsersController.selectUserById(comDTO.authorId)
 
             val listComments = CommentController.selectAllCommentsByComId(comDTO.id).mapNotNull { commentDTO ->
-                authorDTO?.let { commentDTO.toCommentResponse(it.avatarId, it.name) }
+                authorDTO?.let { commentDTO.toCommentResponse(
+                    generateImagUrl(call.request.host(), call.request.port(), it.avatarId), it.name) }
             }
 
-            val response = comDTO.toFullComResponse(listLikers, listComments)
+            val response = comDTO.toFullComResponse(
+                generateImagUrl(call.request.host(), call.request.port(), comDTO.imageId), listLikers, listComments)
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -161,7 +169,8 @@ object ComsService {
             val response = ComsController.selectAllComsPublished("").map { com ->
                 val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                 val countComments = CommentController.selectCountAllCommentsByComId(com.id)
-                com.toShortComResponse(countLikers, countComments)
+                com.toShortComResponse(
+                    generateImagUrl(call.request.host(), call.request.port(), com.imageId), countLikers, countComments)
             }
             call.respond(HttpStatusCode.OK, response)
         }
@@ -176,7 +185,8 @@ object ComsService {
                 val response = ComsController.selectAllComsCreated("").map { com ->
                     val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                     val countComments = CommentController.selectCountAllCommentsByComId(com.id)
-                    com.toShortComResponse(countLikers, countComments)
+                    com.toShortComResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), com.imageId), countLikers, countComments)
                 }
                 call.respond(HttpStatusCode.OK, response)
             }

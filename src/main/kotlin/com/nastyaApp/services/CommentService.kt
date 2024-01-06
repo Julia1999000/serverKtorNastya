@@ -30,7 +30,9 @@ object CommentService {
                 val commentDTO = CommentController.selectCommentById(newCommentId)
 
                 val userDTO = UsersController.selectUserById(userId)
-                val response = userDTO?.let { commentDTO?.toCommentResponse(it.avatarId, it.name) }
+                val response = userDTO?.let {
+                    commentDTO?.toCommentResponse(generateImagUrl(call.request.host(), call.request.port(), it.avatarId), it.name)
+                }
                 if (response != null) {
                     call.respond(HttpStatusCode.Created, response)
                 }
@@ -84,7 +86,8 @@ object CommentService {
 
             val response = CommentController.selectAllCommentsByComId(comId).mapNotNull { commentDTO ->
                 UsersController.selectUserById(commentDTO.authorId)?.let { authorDTO ->
-                    commentDTO.toCommentResponse(authorDTO.avatarId, authorDTO.name)
+                    commentDTO.toCommentResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), authorDTO.avatarId), authorDTO.name)
                 }
             }
             call.respond(HttpStatusCode.OK, response)

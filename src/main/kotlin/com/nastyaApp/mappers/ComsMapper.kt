@@ -1,15 +1,14 @@
 package com.nastyaApp.mappers
 
 import com.nastyaApp.models.*
-import com.nastyaApp.utils.generateImagUrl
 import kotlinx.datetime.Clock
 import java.util.UUID
 
-fun ComTableRowDTO.toShortComResponse(countLikers: Int = 0, countComments: Int = 0): ShortComResponse {
+fun ComTableRowDTO.toShortComResponse(imageUrl: String?, countLikers: Int = 0, countComments: Int = 0): ShortComResponse {
     return ShortComResponse(
         id = this.id,
         description = this.description,
-        imageUrl = generateImagUrl(this.imageId),
+        imageUrl = imageUrl,
         createdDate = this.createdDate.epochSeconds,
         authorId = this.authorId,
         countLikers = countLikers,
@@ -27,11 +26,11 @@ fun ComRequest.toNewComDTO(authorId: UUID): NewComDTO {
     )
 }
 
-fun ComTableRowDTO.toFullComResponse(likers: List<ShortUserResponse>, comments: List<CommentResponse>): FullComResponse {
+fun ComTableRowDTO.toFullComResponse(imageUrl: String?, likers: List<ShortUserResponse>, comments: List<CommentResponse>): FullComResponse {
     return FullComResponse(
         id = this.id,
         description = this.description,
-        imageUrl = generateImagUrl(this.imageId),
+        imageUrl = imageUrl,
         createdDate = this.createdDate.epochSeconds,
         authorId = this.authorId,
         likers = likers,

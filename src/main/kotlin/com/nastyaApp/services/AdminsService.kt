@@ -23,7 +23,9 @@ object AdminsService {
             val adminDTO = AdminsController.selectAdminById(adminId)
             val token = AdminTokensController.insertAdminToken(adminId)
 
-            adminDTO?.toIdentityAdminResponse(token)?.let { response ->
+            adminDTO?.toIdentityAdminResponse(
+                token, generateImagUrl(call.request.host(), call.request.port(), adminDTO.avatarId)
+            )?.let { response ->
                 call.respond(HttpStatusCode.Created, response)
             }
         }
@@ -40,14 +42,17 @@ object AdminsService {
             }
 
             val token = AdminTokensController.insertAdminToken(adminDTO.id)
-            val response = adminDTO.toIdentityAdminResponse(token)
+            val response = adminDTO.toIdentityAdminResponse(
+                token, generateImagUrl(call.request.host(), call.request.port(), adminDTO.avatarId))
             call.respond(HttpStatusCode.OK, response)
         }
     }
 
     suspend fun getAllAdmins(call: ApplicationCall) {
         apiCatch(call) {
-            val response = AdminsController.selectAllAdmins().map { it.toAdminInfoResponse() }
+            val response = AdminsController.selectAllAdmins().map {
+                it.toAdminInfoResponse(generateImagUrl(call.request.host(), call.request.port(), it.avatarId))
+            }
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -60,7 +65,8 @@ object AdminsService {
             val adminDTO = AdminsController.selectAdminById(adminId)
                 ?: return@apiCatch call.respond(HttpStatusCode.NotFound, "Admin not found")
 
-            val response = adminDTO.toAdminInfoResponse()
+            val response = adminDTO.toAdminInfoResponse(
+                generateImagUrl(call.request.host(), call.request.port(), adminDTO.avatarId))
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -77,7 +83,10 @@ object AdminsService {
                 val newAdminDTO = request.toNewAdminDTO()
 
                 AdminsController.updateAdminById(adminId, newAdminDTO)
-                AdminsController.selectAdminById(adminId)?.toAdminInfoResponse()?.let {
+                val adminDTO = AdminsController.selectAdminById(adminId)
+                adminDTO?.toAdminInfoResponse(
+                    generateImagUrl(call.request.host(), call.request.port(), adminDTO.avatarId)
+                )?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
             }

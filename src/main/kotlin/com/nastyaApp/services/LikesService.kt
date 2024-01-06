@@ -8,6 +8,7 @@ import com.nastyaApp.mappers.toShortUserResponse
 import com.nastyaApp.utils.*
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 
 object LikesService {
@@ -58,7 +59,11 @@ object LikesService {
                 ?: return@apiCatch call.respond(HttpStatusCode.BadRequest, "Com id not found")
 
             val response = LikesController.selectAllLikesByComId(comId).mapNotNull { like ->
-                UsersController.selectUserById(like.likerId)?.toShortUserResponse()
+                UsersController.selectUserById(like.likerId)?.let { user ->
+                    user.toShortUserResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), user.avatarId)
+                    )
+                }
             }
             call.respond(HttpStatusCode.OK, response)
         }

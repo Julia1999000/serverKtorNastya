@@ -4,9 +4,7 @@ import com.nastyaApp.models.CommentResponse
 import com.nastyaApp.models.CommentTableRowDTO
 import com.nastyaApp.models.CreateCommentRequest
 import com.nastyaApp.models.NewCommentDTO
-import com.nastyaApp.utils.generateImagUrl
 import kotlinx.datetime.Clock
-import java.util.UUID
 
 fun CreateCommentRequest.toNewCommentDTO(): NewCommentDTO {
     return NewCommentDTO(
@@ -17,14 +15,14 @@ fun CreateCommentRequest.toNewCommentDTO(): NewCommentDTO {
     )
 }
 
-fun CommentTableRowDTO.toCommentResponse(authorAvatarId: UUID?, authorName: String): CommentResponse {
+fun CommentTableRowDTO.toCommentResponse(authorAvatarUrl: String?, authorName: String): CommentResponse {
     return CommentResponse(
         id = this.id,
         authorId = this.authorId,
         comId = this.comId,
         text = this.text,
         createdDate = this.createdDate.epochSeconds,
-        authorAvatarUrl = generateImagUrl(authorAvatarId),
+        authorAvatarUrl = authorAvatarUrl,
         authorName = authorName
     )
 }

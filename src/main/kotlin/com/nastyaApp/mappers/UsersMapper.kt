@@ -1,7 +1,6 @@
 package com.nastyaApp.mappers
 
 import com.nastyaApp.models.*
-import com.nastyaApp.utils.generateImagUrl
 import java.util.UUID
 
 fun RegistrationRequest.toAnonymDTO(): AnonymDTO {
@@ -12,28 +11,28 @@ fun RegistrationRequest.toAnonymDTO(): AnonymDTO {
     )
 }
 
-fun UserTableRowDTO.toIdentityUserResponse(token: UUID): IdentityUserResponse {
+fun UserTableRowDTO.toIdentityUserResponse(token: UUID, avatarUrl: String?): IdentityUserResponse {
     return IdentityUserResponse(
         id = this.id,
         name = this.name,
-        avatarUrl = generateImagUrl(this.avatarId),
+        avatarUrl = avatarUrl,
         token = token
     )
 }
 
-fun UserTableRowDTO.toShortUserResponse(): ShortUserResponse {
+fun UserTableRowDTO.toShortUserResponse(avatarUrl: String?): ShortUserResponse {
     return ShortUserResponse(
         id = this.id,
         name = this.name,
-        avatarUrl = generateImagUrl(this.avatarId)
+        avatarUrl = avatarUrl
     )
 }
 
-fun UserTableRowDTO.toFullUserResponse(listComs: List<ShortComResponse>, listBoards: List<BoardResponse>): FullUserResponse {
+fun UserTableRowDTO.toFullUserResponse(avatarUrl: String?, listComs: List<ShortComResponse>, listBoards: List<BoardResponse>): FullUserResponse {
     return FullUserResponse(
         id = this.id,
         name = this.name,
-        avatarUrl = generateImagUrl(this.avatarId),
+        avatarUrl = avatarUrl,
         publishComs = listComs,
         publicBoards = listBoards
     )

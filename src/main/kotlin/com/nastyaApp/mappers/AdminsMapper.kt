@@ -1,23 +1,22 @@
 package com.nastyaApp.mappers
 
 import com.nastyaApp.models.*
-import com.nastyaApp.utils.generateImagUrl
 import java.util.UUID
 
-fun AdminTableRowDTO.toIdentityAdminResponse(token: UUID): IdentityAdminResponse {
+fun AdminTableRowDTO.toIdentityAdminResponse(token: UUID, avatarUrl: String?): IdentityAdminResponse {
     return IdentityAdminResponse(
         id = this.id,
         name = this.name,
-        avatarUrl = generateImagUrl(this.avatarId),
+        avatarUrl = avatarUrl,
         token = token
     )
 }
 
-fun AdminTableRowDTO.toAdminInfoResponse(): AdminInfoResponse {
+fun AdminTableRowDTO.toAdminInfoResponse(avatarUrl: String?): AdminInfoResponse {
     return AdminInfoResponse(
         id = this.id,
         name = this.name,
-        avatarUrl = generateImagUrl(this.avatarId)
+        avatarUrl = avatarUrl
     )
 }
 

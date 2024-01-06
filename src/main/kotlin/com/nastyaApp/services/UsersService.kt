@@ -20,7 +20,9 @@ object UsersService {
             val userDTO = UsersController.selectUserById(userId)
             val token = UserTokensController.insertUserToken(userId)
 
-            userDTO?.toIdentityUserResponse(token)?.let { response ->
+            userDTO?.toIdentityUserResponse(
+                token, generateImagUrl(call.request.host(), call.request.port(), userDTO.avatarId)
+            )?.let { response ->
                 call.respond(HttpStatusCode.Created, response)
             }
         }
@@ -37,7 +39,8 @@ object UsersService {
             }
 
             val token = UserTokensController.insertUserToken(userDTO.id)
-            val response = userDTO.toIdentityUserResponse(token)
+            val response = userDTO.toIdentityUserResponse(
+                token, generateImagUrl(call.request.host(), call.request.port(), userDTO.avatarId))
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -45,7 +48,9 @@ object UsersService {
     suspend fun getAllUsers(call: ApplicationCall) {
         // TODO pagination
         apiCatch(call) {
-            val response = UsersController.selectAllUsers("").map { it.toShortUserResponse() }
+            val response = UsersController.selectAllUsers("").map {
+                it.toShortUserResponse(generateImagUrl(call.request.host(), call.request.port(), it.avatarId))
+            }
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -61,12 +66,14 @@ object UsersService {
             val listComs = ComsController.selectPublishedComsByAuthorId(userId).map { com ->
                 val countLikers = LikesController.selectCountAllLikesByComId(com.id)
                 val countComments = CommentController.selectCountAllCommentsByComId(com.id)
-                com.toShortComResponse(countLikers, countComments)
+                com.toShortComResponse(generateImagUrl(
+                    call.request.host(), call.request.port(), userDTO.avatarId),countLikers, countComments)
             }
             val listBoards = BoardController.selectAllPublicBoardsByUserId(userId).map {
                 it.toBoardResponse()
             }
-            val response = userDTO.toFullUserResponse(listComs, listBoards)
+            val response = userDTO.toFullUserResponse(
+                generateImagUrl(call.request.host(), call.request.port(), userDTO.avatarId), listComs, listBoards)
             call.respond(HttpStatusCode.OK, response)
         }
     }
@@ -82,7 +89,11 @@ object UsersService {
                 val newUserDTO = request.toNewUserDTO()
 
                 UsersController.updateUserById(userId, newUserDTO)
-                UsersController.selectUserById(userId)?.toShortUserResponse()?.let {
+                UsersController.selectUserById(userId)?.let { userDTO->
+                    userDTO.toShortUserResponse(
+                        generateImagUrl(call.request.host(), call.request.port(), userDTO.avatarId)
+                    )
+                }?.let {
                     call.respond(HttpStatusCode.OK, it)
                 }
             }
