@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gradle-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gradle-app
+  template:
+    metadata:
+      labels:
+        app: gradle-app
+    spec:
+      containers:
+        - name: gradle-app
+          image: nastyaakaply/comfort-image:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://0.0.0.0:5432/db_comfort
+            - name: DB_USER
+              value: masha
+            - name: DB_PASSWORD
+              value: "8919210"
+            - name: SERVER_HOST
+              value: "0.0.0.0"
+            - name: SERVER_PORT
+              value: "8090"
+        - name: database
+          image: postgres
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: masha
+            - name: POSTGRES_PASSWORD
+              value: "8919210"
+            - name: POSTGRES_DB
+              value: db_comfort
