@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gradle-app
-          image: nastyaakaply/comfort-image:latest
+          image: nastyaakaply/comfort:1.0
           ports:
             - containerPort: 8090
           env:
