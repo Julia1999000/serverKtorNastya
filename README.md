@@ -33,4 +33,3 @@ SERVER_PORT
 `minikube start`
 
 ## Документация [API](https://test-my.postman.co/workspaces)
-
