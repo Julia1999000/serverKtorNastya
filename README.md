@@ -8,13 +8,19 @@
 ![структура бд](https://github.com/Julia1999000/serverKtorNastya/assets/99553591/8d1a1a68-59d6-4687-bf26-23420d1b8f87)
 
 ## Используемые фреймворки
-### `Ktor` для создания серверного приложения на языке Kotlin.
-### `serialization-gson` для поддержки сериализации/десериализации данных в формате JSON с помощью библиотеки Gson.
-### `Exposed` для работы с базами данных на языке Kotlin.
-### `PostgreSQL` для работы с СУБД PostgreSQL.
+
+`Ktor` для создания серверного приложения на языке Kotlin.
+
+`serialization-gson` для поддержки сериализации/десериализации данных в формате JSON с помощью библиотеки Gson.
+
+`Exposed` для работы с базами данных на языке Kotlin.
+
+`PostgreSQL` для работы с СУБД PostgreSQL.
 
 ## Клонирование репозитория
-`git clone https://github.com/Julia1999000/serverKtorNastya.git`
+```
+git clone https://github.com/Julia1999000/serverKtorNastya.git
+```
 
 ## Запуск в IntelliJ IDEA Ultimate
 ### Необходимо завести перменные окружения: 
@@ -27,12 +33,23 @@ SERVER_PORT
 ```
 
 ## Запуск приложения (docker)
-`docker-compose up`
+```
+docker-compose up
+```
 
 ## Запуск машины minikube
-`minikube start`
+```
+minikube start
+```
 
 ## Запуск сервиса minikube
-`minikube service gradle-app-service`
+```
+minikube service gradle-app-service
+```
 
 ## Документация [API](https://test-my.postman.co/workspaces)
+
+## Подгрузить образ
+```
+docker pull nastyaakaply/comfort
+```
