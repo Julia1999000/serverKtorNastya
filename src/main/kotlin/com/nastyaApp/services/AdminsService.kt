@@ -82,6 +82,11 @@ object AdminsService {
                 val request = call.receive<UpdateAdminInfoRequest>()
                 val newAdminDTO = request.toNewAdminDTO()
 
+                val oldAvatarId = AdminsController.selectAdminById(adminId)?.avatarId
+                if (newAdminDTO.avatarId != null && oldAvatarId != null) {
+                    FilesController.deleteImageById(oldAvatarId)
+                }
+
                 AdminsController.updateAdminById(adminId, newAdminDTO)
                 val adminDTO = AdminsController.selectAdminById(adminId)
                 adminDTO?.toAdminInfoResponse(

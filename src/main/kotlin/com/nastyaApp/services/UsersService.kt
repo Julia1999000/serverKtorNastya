@@ -88,6 +88,11 @@ object UsersService {
                 val request = call.receive<UpdateUserInfoRequest>()
                 val newUserDTO = request.toNewUserDTO()
 
+                val oldAvatarId = UsersController.selectUserById(userId)?.avatarId
+                if (newUserDTO.avatarId != null && oldAvatarId != null) {
+                    FilesController.deleteImageById(oldAvatarId)
+                }
+
                 UsersController.updateUserById(userId, newUserDTO)
                 UsersController.selectUserById(userId)?.let { userDTO->
                     userDTO.toShortUserResponse(
